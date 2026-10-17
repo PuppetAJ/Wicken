@@ -55,7 +55,7 @@ jobs:
       - run: pnpm install --frozen-lockfile
 
       # Chromium is ~130MB and never changes between runs of the same Playwright version.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
@@ -63,7 +63,7 @@ jobs:
       - run: pnpm exec playwright install --with-deps chromium
 
       # Next's own build cache; the fallback key means a source change still starts from something warm.
-      - uses: actions/cache@v4
+      - uses: actions/cache@v6
         with:
           path: .next/cache
           key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('src/**', 'public/**') }}
@@ -96,7 +96,7 @@ jobs:
 
       # The report and a failed test's trace and screenshot, to step through without rerunning.
       - if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.suite }}-failure
           path: |
