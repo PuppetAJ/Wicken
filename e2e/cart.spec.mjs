@@ -1,11 +1,7 @@
 // The cart, the guest cart being claimed, and checkout. Needs a seeded database.
-import { BASE, freshPage, launch, open, reporter, signInAsDemo, visibleText } from './lib.mjs'
+import { BASE, check, freshPage, open, signInAsDemo, test, visibleText } from './lib.mjs'
 
-const { browser, pageErrors, close } = await launch()
-const { check, section, report } = reporter()
-
-section('Cart')
-{
+test('Cart', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const badge = () => shop.locator('button[aria-label="Open cart"] span').first()
   // The badge is a server component that re-renders after the action, so it lands after the sheet opens.
@@ -66,10 +62,9 @@ section('Cart')
   check('emptying it shows the empty state', /Nothing in here yet/.test(await visibleText(shop)))
   check('and the badge goes', (await badge().count()) === 0)
   await context.close()
-}
+})
 
-section('The sheet does not reopen by itself')
-{
+test('The sheet does not reopen by itself', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const sheet = () =>
     shop
@@ -100,10 +95,9 @@ section('The sheet does not reopen by itself')
   await shop.locator('[data-slot="sheet-content"]').waitFor()
   check('and a genuine add still opens it', await sheet())
   await context.close()
-}
+})
 
-section('Carrying a guest cart into an account')
-{
+test('Carrying a guest cart into an account', async ({ browser }) => {
   const { context, page: guest } = await freshPage(browser)
   const cartText = async () => {
     await guest.goto(`${BASE}/cart`, { waitUntil: 'networkidle' })
@@ -155,10 +149,9 @@ section('Carrying a guest cart into an account')
   await emptyTheCart()
   check('the demo account is left as it was found', /Nothing in here yet/.test(await cartText()))
   await context.close()
-}
+})
 
-section('A claimed cart cannot be reached by its old cookie')
-{
+test('A claimed cart cannot be reached by its old cookie', async ({ browser }) => {
   const { context: victimContext, page: victim } = await freshPage(browser)
   await victim.goto(`${BASE}/products/ash-dining-table`, { waitUntil: 'networkidle' })
   await victim.getByRole('button', { name: 'Add to cart' }).click()
@@ -196,10 +189,9 @@ section('A claimed cart cannot be reached by its old cookie')
     await victim.waitForTimeout(900)
   }
   await victimContext.close()
-}
+})
 
-section('Checkout')
-{
+test('Checkout', async ({ browser }) => {
   const { context, page: buyer } = await freshPage(browser)
 
   await buyer.goto(`${BASE}/checkout`, { waitUntil: 'networkidle' })
@@ -306,7 +298,4 @@ section('Checkout')
     check("another account cannot open somebody else's order", !/Ash Dining Table/.test(await visibleText(other)))
     await nosy.close()
   }
-}
-
-await close()
-process.exit(report(pageErrors))
+})

@@ -26,8 +26,8 @@
     "format": "prettier --write .",
     "typecheck": "next typegen && tsc --noEmit",
     "test": "NODE_ENV=test node --conditions=react-server --env-file-if-exists=.env scripts/setup-test-db.ts && NODE_ENV=test STRIPE_SECRET_KEY=sk_test_signing_only STRIPE_WEBHOOK_SECRET=whsec_signing_only node --conditions=react-server --env-file-if-exists=.env --test --test-concurrency=1 \"src/**/*.test.ts\"",
-    "test:e2e": "node --env-file-if-exists=.env e2e/run.mjs",
-    "test:a11y": "node e2e/a11y.mjs",
+    "test:e2e": "playwright test --project=suites",
+    "test:a11y": "playwright test --project=a11y",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:migrate": "node-pg-migrate up --envPath .env -m migrations",
@@ -70,6 +70,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "^1.63.0",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/node": "^26.5.1",
     "@types/pg": "^8.23.1",

@@ -23,7 +23,7 @@ TypeScript, Tailwind 4, Postgres talked to directly through `pg` rather than an 
 sessions with email or Google, Stripe for checkout, Motion for the reveals.
 
 Tooling: pnpm, oxlint instead of ESLint, Node's own test runner instead of Jest, and Playwright
-driven from plain scripts instead of `@playwright/test`.
+Test for the browser suites.
 
 ## Running it
 
@@ -55,7 +55,7 @@ pnpm test:a11y   # axe over every page, signed out and signed in
 The browser suites need the app running and the database seeded. They default to
 `http://localhost:3000` and print which server they are using; point them elsewhere with
 `E2E_BASE_URL`. They are split into five areas and `pnpm test:e2e` runs them in order, or
-`node e2e/run.mjs admin` runs one. In CI each area gets its own runner, and the app runs under the
+`pnpm test:e2e admin` runs one. In CI each area gets its own runner, and the app runs under the
 same restricted database role it uses in production.
 
 ## How the code is arranged

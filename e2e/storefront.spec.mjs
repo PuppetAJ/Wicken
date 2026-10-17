@@ -1,11 +1,7 @@
 // The shop, the pages that sell, and everything a visitor sees signed out. Needs a seeded database.
-import { BASE, freshPage, launch, open, reporter, signInAsDemo, visibleText, waitForText } from './lib.mjs'
+import { BASE, check, freshPage, open, signInAsDemo, test, visibleText, waitForText } from './lib.mjs'
 
-const { browser, page, pageErrors, close } = await launch()
-const { check, section, report } = reporter()
-
-section('Catalog')
-{
+test('Catalog', async ({ page }) => {
   await page.goto(`${BASE}/shop`, { waitUntil: 'networkidle' })
   const all = await page.locator('a[href^="/products/"]').count()
   check('the shop lists the seeded catalog', all >= 30, `${all} tiles`)
@@ -25,10 +21,9 @@ section('Catalog')
   await page.goto(`${BASE}/shop?category=bogus&sort=bogus`, { waitUntil: 'networkidle' })
   const bogus = await page.locator('a[href^="/products/"]').count()
   check('nonsense search params fall back rather than throwing', bogus >= 30, `${bogus} tiles`)
-}
+})
 
-section('The landing page sells something')
-{
+test('The landing page sells something', async ({ browser }) => {
   const { context, page: home } = await freshPage(browser)
   await home.goto(`${BASE}/`, { waitUntil: 'networkidle' })
   const text = await visibleText(home)
@@ -55,10 +50,9 @@ section('The landing page sells something')
   const flush = await home.locator('footer').evaluate((f) => getComputedStyle(f).paddingTop)
   check('and on a phone the closing card meets the footer', flush === '0px', flush)
   await context.close()
-}
+})
 
-section('About earns its page')
-{
+test('About earns its page', async ({ page }) => {
   await page.goto(`${BASE}/about`, { waitUntil: 'networkidle' })
   const photographs = await page.locator('main img').count()
   check('the editorial photographs are finally used', photographs >= 4, `${photographs} photographs`)
@@ -66,10 +60,9 @@ section('About earns its page')
   const text = await visibleText(page)
   check('the making is explained rather than asserted', /Handling clay while the light is good/.test(text))
   check('and the landing page promise is kept', /Maren/.test(text))
-}
+})
 
-section('The help page')
-{
+test('The help page', async ({ browser }) => {
   const { context, page: help } = await freshPage(browser)
   await help.goto(`${BASE}/faq`, { waitUntil: 'networkidle' })
   check('the old FAQ route redirects rather than 404s', help.url().endsWith('/help'), help.url())
@@ -101,10 +94,9 @@ section('The help page')
   await open(admin, `/admin/messages`)
   check('and it is waiting in the admin', (await visibleText(admin)).includes(said))
   await theirs.close()
-}
+})
 
-section('Product page')
-{
+test('Product page', async ({ page }) => {
   await page.goto(`${BASE}/products/ash-dining-table`, { waitUntil: 'networkidle' })
   const text = await visibleText(page)
   check('the product page shows its price', /\$\d/.test(text))
@@ -146,10 +138,10 @@ section('Product page')
     Math.abs(beforeAccordion.height - afterAccordion.height) < 2,
     `${Math.round(beforeAccordion.height)} then ${Math.round(afterAccordion.height)}`,
   )
-}
+})
 
-section('Image magnifier')
-{
+test('Image magnifier', async ({ page }) => {
+  await page.goto(`${BASE}/products/ash-dining-table`, { waitUntil: 'networkidle' })
   const trigger = page.locator('button[aria-label^="View"]').first()
   const image = trigger.locator('img')
   const box = await trigger.boundingBox()
@@ -178,10 +170,9 @@ section('Image magnifier')
   await page.keyboard.press('Escape')
   await page.waitForTimeout(400)
   check('escape closes it', (await page.locator('[role="dialog"]').count()) === 0)
-}
+})
 
-section('Who made it, and how long it takes')
-{
+test('Who made it, and how long it takes', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   for (const [slug, maker, lead] of [
     ['linen-table-runner', 'Rosedale Weaving', '3–5 business days'],
@@ -199,10 +190,9 @@ section('Who made it, and how long it takes')
   const band = await visibleText(reader)
   check('the landing page counts the workshops correctly', /three workshops/.test(band))
   await context.close()
-}
+})
 
-section('A missing product')
-{
+test('A missing product', async ({ page }) => {
   const response = await page.goto(`${BASE}/products/does-not-exist`, { waitUntil: 'networkidle' })
   const text = await visibleText(page)
   // The product segment has its own not-found copy; the global one is a different page.
@@ -213,10 +203,9 @@ section('A missing product')
     `status was ${response.status()}`,
   )
   check('no product markup is served', !/Add to cart/i.test(text))
-}
+})
 
-section('More from a category')
-{
+test('More from a category', async ({ browser }) => {
   const { context, page: nav } = await freshPage(browser)
   await nav.goto(`${BASE}/products/ash-glaze-dinner-plate`, { waitUntil: 'networkidle' })
   const rail = nav.locator('ul:has(> li a[href^="/products/"])').last()
@@ -230,10 +219,9 @@ section('More from a category')
   const after = await rail.evaluate((element) => element.scrollLeft)
   check('and it pages the rail along', after > before, `scrollLeft ${before} to ${after}`)
   await context.close()
-}
+})
 
-section('The shop skeleton mirrors the shop')
-{
+test('The shop skeleton mirrors the shop', async () => {
   // The prerendered shell is read straight from the response rather than racing the browser for it.
   const html = await (await fetch(`${BASE}/shop`)).text()
   const shell = html.split('<script>self.__next_f')[0]
@@ -244,10 +232,9 @@ section('The shop skeleton mirrors the shop')
   check('with facet rows in it', rows > 5, `${rows} rows`)
   const pills = (shell.match(/h-8 rounded-full/g) ?? []).length
   check('and the category pills above it', pills > 3, `${pills} pills`)
-}
+})
 
-section('The widened catalog')
-{
+test('The widened catalog', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const tiles = () => shop.locator('article').count()
 
@@ -271,10 +258,9 @@ section('The widened catalog')
   await shop.goto(`${BASE}/shop?material=linen`, { waitUntil: 'networkidle' })
   check('and linen reaches the textiles', (await tiles()) >= 5, `${await tiles()} in linen`)
   await context.close()
-}
+})
 
-section('Material and color filters')
-{
+test('Material and color filters', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const tiles = () => shop.locator('article').count()
 
@@ -349,10 +335,9 @@ section('Material and color filters')
   await shop.waitForTimeout(1800)
   check('clicking a tile image opens the product', shop.url().includes('/products/'), shop.url())
   await context.close()
-}
+})
 
-section('Filtering does not reload or flood')
-{
+test('Filtering does not reload or flood', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   let requests = 0
   shop.on('request', (request) => {
@@ -400,10 +385,9 @@ section('Filtering does not reload or flood')
     await shop.evaluate(() => performance.getEntriesByType('navigation').length === 1),
   )
   await context.close()
-}
+})
 
-section('Price bands')
-{
+test('Price bands', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const tiles = () => shop.locator('article').count()
 
@@ -439,10 +423,9 @@ section('Price bands')
   await shop.waitForURL((url) => url.searchParams.getAll('price').includes('under-50'))
   check('and it fills once checked', (await fill(boxOf('price', 'under-50'))) !== idle, `was ${idle}`)
   await context.close()
-}
+})
 
-section('Sale prices')
-{
+test('Sale prices', async ({ browser }) => {
   const { context, page: shopper } = await freshPage(browser)
 
   await shopper.goto(`${BASE}/products/harvest-vase`, { waitUntil: 'networkidle' })
@@ -463,10 +446,9 @@ section('Sale prices')
   await shopper.goto(`${BASE}/shop?category=vases`, { waitUntil: 'networkidle' })
   check('the grid marks it as on sale', /% off/.test(await visibleText(shopper)))
   await context.close()
-}
+})
 
-section('Reviews')
-{
+test('Reviews', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
 
   await reader.goto(`${BASE}/products/oak-wall-shelf`, { waitUntil: 'networkidle' })
@@ -478,10 +460,9 @@ section('Reviews')
 
   check('a signed-out visitor is asked to log in', /Log in/.test(section), section.slice(-120))
   await context.close()
-}
+})
 
-section('Sorting reviews')
-{
+test('Sorting reviews', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
 
   const open = async (query = '') => {
@@ -529,10 +510,9 @@ section('Sorting reviews')
   await open('?reviews=bogus')
   check('a bogus sort falls back rather than throwing', (await scores()).length === helpful.length)
   await context.close()
-}
+})
 
-section('Long review lists are capped')
-{
+test('Long review lists are capped', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   await reader.goto(`${BASE}/products/spouted-pendant`, { waitUntil: 'networkidle' })
   await reader.locator('#reviews').scrollIntoViewIfNeeded()
@@ -556,10 +536,9 @@ section('Long review lists are capped')
   await reader.waitForTimeout(400)
   check('folding back returns to the cap', (await shown()) === capped)
   await context.close()
-}
+})
 
-section('Choosing a review sort does not jump')
-{
+test('Choosing a review sort does not jump', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   await reader.goto(`${BASE}/products/spouted-pendant`, { waitUntil: 'networkidle' })
   // Scrolled to the control first, or the browser's own scroll-into-view on focus is read as the sort's.
@@ -573,7 +552,4 @@ section('Choosing a review sort does not jump')
   check('the page stays where it was', Math.abs(before - after) < 60, `${Math.round(before)} to ${Math.round(after)}`)
   check('but the sort did apply', reader.url().includes('reviews=lowest'), reader.url())
   await context.close()
-}
-
-await close()
-process.exit(report(pageErrors))
+})

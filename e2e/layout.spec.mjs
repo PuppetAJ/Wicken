@@ -1,8 +1,5 @@
 // How the site behaves at a phone width, and the motion that arrives with it. Needs a seeded database.
-import { BASE, freshPage, launch, open, reporter, signInAsDemo } from './lib.mjs'
-
-const { browser, pageErrors, close } = await launch()
-const { check, section, report } = reporter()
+import { BASE, check, freshPage, open, signInAsDemo, test } from './lib.mjs'
 
 /** The stagger is the one thing here that really takes time; wait for it to finish rather than guess. */
 async function settledTiles(page) {
@@ -21,8 +18,7 @@ async function settledTiles(page) {
     .catch(() => {})
 }
 
-section('Nothing scrolls sideways on a phone')
-{
+test('Nothing scrolls sideways on a phone', async ({ browser }) => {
   // 320px is the narrowest phone still in use; a document wider than its viewport slides under the thumb.
   const context = await browser.newContext({ viewport: { width: 320, height: 900 } })
   const narrow = await context.newPage()
@@ -63,10 +59,9 @@ section('Nothing scrolls sideways on a phone')
     check(`${label} fits a 320px screen`, width <= 321, `${width}px wide`)
   }
   await adminContext.close()
-}
+})
 
-section('Products arrive one after another')
-{
+test('Products arrive one after another', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   // Recorded as it happens: one sample cannot tell a tile that has finished from one that never started.
   await shop.addInitScript(() => {
@@ -165,10 +160,9 @@ section('Products arrive one after another')
     .catch(() => false)
   check('and changing it plays the reveal again', replayed)
   await swapped.close()
-}
+})
 
-section('A phone at its narrowest')
-{
+test('A phone at its narrowest', async ({ browser }) => {
   // 320px, with a cart that has something in it: an empty cart hides every layout problem.
   const context = await browser.newContext({ viewport: { width: 320, height: 720 } })
   const tiny = await context.newPage()
@@ -243,10 +237,9 @@ section('A phone at its narrowest')
   check('where there is room the rail is simply there', await roomy.locator('[data-inline-filters="rail"]').isVisible())
   check('and nothing is hidden behind a button', await roomy.getByRole('button', { name: /^Filters/ }).isHidden())
   await wide.close()
-}
+})
 
-section('The menu knows when its button has gone')
-{
+test('The menu knows when its button has gone', async ({ browser }) => {
   // An iPad turning to landscape crosses lg, and used to be left with the sheet open over the desktop layout.
   const context = await browser.newContext({ viewport: { width: 800, height: 900 } })
   const tablet = await context.newPage()
@@ -264,7 +257,4 @@ section('The menu knows when its button has gone')
   await tablet.waitForTimeout(600)
   check('without reopening when the width comes back', await sheet.isHidden())
   await context.close()
-}
-
-await close()
-process.exit(report(pageErrors))
+})
