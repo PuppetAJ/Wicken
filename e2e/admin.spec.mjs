@@ -1,22 +1,18 @@
 // The admin area, and that a Server Action checks its own caller. Needs a seeded database.
 import {
   BASE,
+  check,
   freshPage,
-  launch,
   open,
   openAccountMenu,
-  reporter,
   signInAsDemo,
   submitted,
+  test,
   visibleText,
   waitForText,
 } from './lib.mjs'
 
-const { browser, pageErrors, close } = await launch()
-const { check, section, report } = reporter()
-
-section('Authorization')
-{
+test('Authorization', async ({ browser }) => {
   const { context: shopperContext, page: shopper } = await freshPage(browser)
   await signInAsDemo(shopper, 'shopper')
   await open(shopper, `/admin`)
@@ -46,10 +42,9 @@ section('Authorization')
   await forged.goto(`${BASE}/account/orders`, { waitUntil: 'networkidle' })
   check('a forged cookie gets past the proxy but not the page', !/Your orders/i.test(await visibleText(forged)))
   await forgedContext.close()
-}
+})
 
-section('The admin dashboard')
-{
+test('The admin dashboard', async ({ browser }) => {
   const { context, page: admin } = await freshPage(browser)
   await signInAsDemo(admin, 'admin')
   await open(admin, `/admin`)
@@ -79,10 +74,9 @@ section('The admin dashboard')
   await open(admin, `/admin?range=nonsense`)
   check('a bogus period falls back rather than throwing', /Last 30 days/.test(await visibleText(admin)))
   await context.close()
-}
+})
 
-section('Admin lists')
-{
+test('Admin lists', async ({ browser }) => {
   const { context, page: admin } = await freshPage(browser)
   await signInAsDemo(admin, 'admin')
   const rows = () => admin.locator('tbody tr').count()
@@ -157,10 +151,9 @@ section('Admin lists')
   const paged = await visibleText(admin)
   check('and says where you are', /Page 2 of|Nothing to show|of \d/.test(paged), paged.slice(0, 60))
   await context.close()
-}
+})
 
-section('The admin search filters as you type')
-{
+test('The admin search filters as you type', async ({ browser }) => {
   const { context, page: admin } = await freshPage(browser)
   await signInAsDemo(admin, 'admin')
   let requests = 0
@@ -189,10 +182,9 @@ section('The admin search filters as you type')
   await admin.waitForTimeout(3000)
   check('and stops once idle', requests === afterTyping, `${requests - afterTyping} more while idle`)
   await context.close()
-}
+})
 
-section('The admin writes for real')
-{
+test('The admin writes for real', async ({ browser }) => {
   const { context, page: admin } = await freshPage(browser)
   await signInAsDemo(admin, 'admin')
 
@@ -251,10 +243,9 @@ section('The admin writes for real')
     `${await admin.locator('input[name="stock"]').inputValue()} vs ${wasStock}`,
   )
   await context.close()
-}
+})
 
-section('A Server Action is not protected by its button')
-{
+test('A Server Action is not protected by its button', async ({ browser }) => {
   // A made-up id answers 404 for everybody, so the id comes from a real submission the admin just made.
   const { context, page: admin } = await freshPage(browser)
   await signInAsDemo(admin, 'admin')
@@ -307,7 +298,4 @@ section('A Server Action is not protected by its button')
     `${await mover(verifier).inputValue()} vs ${was}`,
   )
   await checkContext.close()
-}
-
-await close()
-process.exit(report(pageErrors))
+})

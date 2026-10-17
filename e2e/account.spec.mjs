@@ -1,25 +1,21 @@
 // Throttling runs last because it spends the sign-in budget. Needs a seeded database.
 import {
   BASE,
+  check,
   demo,
   freshPage,
-  launch,
   newShopper,
   open,
   openAccountMenu,
-  reporter,
   signInAsDemo,
   signInWithForm,
   submitted,
+  test,
   visibleText,
   waitForText,
 } from './lib.mjs'
 
-const { browser, pageErrors, close } = await launch()
-const { check, section, report } = reporter()
-
-section('Registering')
-{
+test('Registering', async ({ browser }) => {
   const { context, page: fresh } = await freshPage(browser)
   const shopper = newShopper()
   await fresh.goto(`${BASE}/register`, { waitUntil: 'networkidle' })
@@ -30,10 +26,9 @@ section('Registering')
   await fresh.waitForURL(`${BASE}/`)
   check('registering signs the new account in', (await openAccountMenu(fresh)).includes(shopper.email))
   await context.close()
-}
+})
 
-section('Signing in and out')
-{
+test('Signing in and out', async ({ browser }) => {
   const { context, page: fresh } = await freshPage(browser)
   await signInAsDemo(fresh, 'shopper')
   const menu = await openAccountMenu(fresh)
@@ -47,10 +42,9 @@ section('Signing in and out')
     await fresh.getByRole('link', { name: 'Sign up' }).first().isVisible(),
   )
   await context.close()
-}
+})
 
-section('Where login sends you afterwards')
-{
+test('Where login sends you afterwards', async ({ browser }) => {
   const { context, page: fresh } = await freshPage(browser)
   await fresh.goto(`${BASE}/account/orders`, { waitUntil: 'networkidle' })
   check('the proxy redirects a signed-out visitor', fresh.url().includes('next=%2Faccount%2Forders'), fresh.url())
@@ -72,10 +66,9 @@ section('Where login sends you afterwards')
     check(`${label} is refused as a redirect target`, new URL(p.url()).pathname === '/', p.url())
     await c.close()
   }
-}
+})
 
-section('Finding your way back')
-{
+test('Finding your way back', async ({ browser }) => {
   const { context, page: nav } = await freshPage(browser)
   const filtered = `${BASE}/shop?category=furniture&sort=price-asc`
 
@@ -114,10 +107,9 @@ section('Finding your way back')
   await nav.waitForURL((url) => !url.pathname.startsWith('/login'))
   check('and signing in returns you there', nav.url().includes('category=furniture'), nav.url())
   await context.close()
-}
+})
 
-section('Quick actions on the grid')
-{
+test('Quick actions on the grid', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const badge = () => shop.locator('button[aria-label="Open cart"] span').first()
 
@@ -142,10 +134,9 @@ section('Quick actions on the grid')
   await waitForText(shop, /Log in to save/i)
   check('favouriting signed out asks for a login', /Log in to save/.test(await visibleText(shop)))
   await context.close()
-}
+})
 
-section('Favorites, signed in')
-{
+test('Favorites, signed in', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   await signInAsDemo(shop, 'shopper')
   await shop.goto(`${BASE}/shop?category=vases`, { waitUntil: 'networkidle' })
@@ -165,10 +156,9 @@ section('Favorites, signed in')
   await shop.waitForTimeout(1500)
   check('unfavouriting undoes it', (await after.locator('button[aria-pressed="false"]').count()) === 1)
   await context.close()
-}
+})
 
-section('Favoriting from the product page')
-{
+test('Favoriting from the product page', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   await signInAsDemo(reader, 'shopper')
   await open(reader, `/products/oak-wall-shelf`)
@@ -185,10 +175,9 @@ section('Favoriting from the product page')
   await reader.waitForTimeout(1500)
   check('toggling back leaves it as found', (await save.getAttribute('aria-pressed')) === before)
   await context.close()
-}
+})
 
-section('The account area')
-{
+test('The account area', async ({ browser }) => {
   const { context, page: account } = await freshPage(browser)
   await signInAsDemo(account, 'shopper')
 
@@ -215,10 +204,9 @@ section('The account area')
   await account.locator('button[aria-label^="Remove"]').first().click()
   await account.waitForTimeout(1500)
   await context.close()
-}
+})
 
-section('The newsletter keeps what it is given')
-{
+test('The newsletter keeps what it is given', async ({ browser }) => {
   const { context, page: visitor } = await freshPage(browser)
   await visitor.goto(`${BASE}/about`, { waitUntil: 'networkidle' })
   const footer = visitor.getByRole('contentinfo')
@@ -246,10 +234,9 @@ section('The newsletter keeps what it is given')
     counted?.[0] ?? 'no count',
   )
   await theirs.close()
-}
+})
 
-section('Writing a review')
-{
+test('Writing a review', async ({ browser }) => {
   const { context, page: author } = await freshPage(browser)
   await signInAsDemo(author, 'shopper')
   await author.goto(`${BASE}/products/harvest-vase`, { waitUntil: 'networkidle' })
@@ -279,10 +266,9 @@ section('Writing a review')
   const after = await author.locator('#reviews').innerText()
   check('editing replaces rather than duplicates', after.includes(revised) && !after.includes(words))
   await context.close()
-}
+})
 
-section('Helpful votes on reviews')
-{
+test('Helpful votes on reviews', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   await signInAsDemo(reader, 'shopper')
 
@@ -319,10 +305,9 @@ section('Helpful votes on reviews')
   const panel = await reader.locator('#reviews').innerText()
   check('your own review is not votable', /Your review ·/.test(panel), panel.split('\n').slice(0, 3).join(' | '))
   await context.close()
-}
+})
 
-section('Throttling')
-{
+test('Throttling', async ({ browser }) => {
   const { context, page: fresh } = await freshPage(browser)
   let message = ''
   let trippedAt = 0
@@ -341,7 +326,4 @@ section('Throttling')
   check('repeated wrong passwords are throttled', trippedAt > 0, `ten attempts all answered: ${message}`)
   check('a wrong password does not say whether the account exists', !/no account|unknown|not found/i.test(message))
   await context.close()
-}
-
-await close()
-process.exit(report(pageErrors))
+})

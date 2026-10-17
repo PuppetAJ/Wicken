@@ -1,10 +1,7 @@
 /** Shared setup for the browser suites. Mirrors the one in Chunkd. */
-import { chromium } from 'playwright'
+import { expect, test as base } from '@playwright/test'
 
 export const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
-
-// Printed because the default is the dev server, and a suite run against the wrong one fails oddly.
-console.log(`against ${BASE}`)
 
 // Matches scripts/demo-users.ts; the suite runs against a seeded database.
 export const demo = {
@@ -12,17 +9,23 @@ export const demo = {
   admin: { email: 'admin@wicken.store', password: 'demo-password', name: 'Demo Admin' },
 }
 
-export async function launch({ width = 1280, height = 900, colorScheme = 'light' } = {}) {
-  const browser = await chromium.launch()
-  const context = await browser.newContext({ viewport: { width, height }, colorScheme })
-  const page = await context.newPage()
-  page.setDefaultTimeout(20_000)
-  page.setDefaultNavigationTimeout(30_000)
+/** Playwright Test's `test`, with the page every suite expects: its timeouts, and its uncaught errors failing the test. */
+export const test = base.extend({
+  page: async ({ page }, use) => {
+    page.setDefaultTimeout(20_000)
+    page.setDefaultNavigationTimeout(30_000)
+    const pageErrors = []
+    page.on('pageerror', (error) => pageErrors.push(error.message))
+    await use(page)
+    expect(pageErrors, 'no uncaught errors on the page').toEqual([])
+  },
+})
 
-  const pageErrors = []
-  page.on('pageerror', (error) => pageErrors.push(error.message))
+export { expect }
 
-  return { browser, context, page, pageErrors, close: () => browser.close() }
+/** One check among many: a failure is recorded and the test carries on, so a run shows every failure, not the first. */
+export function check(name, ok, detail = '') {
+  expect.soft(ok, detail ? `${name}   (${String(detail).slice(0, 300)})` : name).toBeTruthy()
 }
 
 /** A fresh context, so a signed-in check cannot leak its cookies into the next one. */
@@ -31,36 +34,6 @@ export async function freshPage(browser, options = {}) {
   const page = await context.newPage()
   page.setDefaultTimeout(20_000)
   return { context, page }
-}
-
-export function reporter() {
-  const results = []
-  let lastCheckAt = Date.now()
-
-  function check(name, ok, detail = '') {
-    results.push({ name, ok, ms: Date.now() - lastCheckAt })
-    lastCheckAt = Date.now()
-    console.log(`  ${ok ? 'PASS' : 'FAIL'}  ${name}${ok || !detail ? '' : `   — ${detail}`}`)
-  }
-
-  function section(title) {
-    console.log(`\n${title}`)
-  }
-
-  /** Returns the exit code rather than exiting, so the caller can close the browser first. */
-  function report(pageErrors = []) {
-    const failed = results.filter((r) => !r.ok)
-    console.log(`\n${results.length - failed.length} passed, ${failed.length} failed`)
-
-    if (pageErrors.length) {
-      console.log(`\nUncaught page errors (${pageErrors.length}):`)
-      for (const message of [...new Set(pageErrors)].slice(0, 10)) console.log('  - ' + message.slice(0, 200))
-    }
-
-    return failed.length === 0 && pageErrors.length === 0 ? 0 : 1
-  }
-
-  return { check, section, report, results }
 }
 
 /** Waits for the layout to stop moving, which is what a fixed pause after a goto was standing in for. */
@@ -128,7 +101,7 @@ export async function signInAsDemo(page, role = 'shopper') {
 export async function openAccountMenu(page) {
   const menu = page.locator('[role="menu"]')
   // Retried because the button is server-rendered and does nothing until the page has hydrated.
-  await expect(async () => {
+  await retry(async () => {
     await page.locator('button[aria-label="Account menu"]').click()
     await menu.waitFor({ timeout: 2_000 })
   })
@@ -136,7 +109,7 @@ export async function openAccountMenu(page) {
 }
 
 /** Runs something until it stops throwing, which is how you wait for hydration without networkidle. */
-async function expect(run, attempts = 10) {
+async function retry(run, attempts = 10) {
   for (let attempt = 1; ; attempt++) {
     try {
       return await run()
