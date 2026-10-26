@@ -10,10 +10,9 @@ export function CartSheet({ badge, children }: { badge: ReactNode; children: Rea
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
-      <SheetTrigger
-        aria-label="Open cart"
-        className="relative inline-flex size-9 items-center justify-center rounded-full text-olive-700 hover:bg-olive-200 dark:text-olive-400 dark:hover:bg-olive-800"
-      >
+      <SheetTrigger className="relative inline-flex size-9 items-center justify-center rounded-full text-olive-700 hover:bg-olive-200 dark:text-olive-400 dark:hover:bg-olive-800">
+        {/* Words in the button rather than an aria-label, so its name takes in the badge's count when there is one. */}
+        <span className="sr-only">Open cart </span>
         <ShoppingBagIcon className="size-5" />
         {badge}
       </SheetTrigger>

@@ -61,7 +61,7 @@ export function ReviewVotes({
         onClick={() => press(true)}
         disabled={pending}
         aria-pressed={tally.own === true}
-        aria-label={`Helpful, ${author}'s review`}
+        aria-label={`Helpful, ${author}'s review: ${tally.helpful}`}
         className={`${button} ${tally.own === true ? on : ''}`}
       >
         <ThumbsUpIcon className="size-3.5" />
@@ -72,7 +72,7 @@ export function ReviewVotes({
         onClick={() => press(false)}
         disabled={pending}
         aria-pressed={tally.own === false}
-        aria-label={`Not helpful, ${author}'s review`}
+        aria-label={`Not helpful, ${author}'s review: ${tally.unhelpful}`}
         className={`${button} ${tally.own === false ? on : ''}`}
       >
         <ThumbsDownIcon className="size-3.5" />

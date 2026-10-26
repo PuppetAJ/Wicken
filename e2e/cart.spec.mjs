@@ -3,12 +3,12 @@ import { BASE, check, freshPage, open, signInAsDemo, test, visibleText } from '.
 
 test('Cart', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
-  const badge = () => shop.locator('button[aria-label="Open cart"] span').first()
+  const badge = () => shop.locator('[data-cart-badge]')
   // The badge is a server component that re-renders after the action, so it lands after the sheet opens.
   const badgeReaches = (count) =>
     shop
       .waitForFunction(
-        (want) => document.querySelector('button[aria-label="Open cart"] span')?.textContent?.trim() === want,
+        (want) => document.querySelector('[data-cart-badge]')?.textContent?.trim() === want,
         String(count),
         { timeout: 20_000 },
       )
