@@ -111,7 +111,7 @@ test('Finding your way back', async ({ browser }) => {
 
 test('Quick actions on the grid', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
-  const badge = () => shop.locator('button[aria-label="Open cart"] span').first()
+  const badge = () => shop.locator('[data-cart-badge]')
 
   await shop.goto(`${BASE}/shop?category=furniture`, { waitUntil: 'networkidle' })
   const card = shop.locator('article').first()
