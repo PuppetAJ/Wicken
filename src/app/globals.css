@@ -166,6 +166,11 @@
     html {
       scroll-behavior: auto;
     }
+    [data-stagger],
+    [data-pop] {
+      opacity: 1 !important;
+      transform: none !important;
+    }
   }
   body {
     @apply bg-background text-foreground;
