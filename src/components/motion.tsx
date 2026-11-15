@@ -1,6 +1,6 @@
 'use client'
 
-import { domAnimation, LazyMotion, m, useReducedMotion, type Variants } from 'motion/react'
+import { domAnimation, LazyMotion, m, type Variants } from 'motion/react'
 import { Children, useCallback, useRef, type ReactNode } from 'react'
 
 const step = 0.06
@@ -23,7 +23,6 @@ const rise: Variants = {
 
 /** Wraps server-rendered children so only the wrapper ships; the delay counts arrivals, not positions. */
 export function Stagger({ children, className }: { children: ReactNode; className?: string }) {
-  const still = useReducedMotion()
   const queue = useRef({ at: 0, next: 0, given: new Map<number, number>() })
 
   // Remembered per tile: Motion resolves a variant more than once, and a fresh slot each time doubles.
@@ -38,8 +37,6 @@ export function Stagger({ children, className }: { children: ReactNode; classNam
     queue.current.given.set(index, slot)
     return slot
   }, [])
-
-  if (still) return <div className={className}>{children}</div>
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -79,10 +76,7 @@ export function Enter({
   /** A span where the parent only accepts phrasing content, such as inside a heading. */
   as?: 'div' | 'span'
 }) {
-  const still = useReducedMotion()
   const Tag = as === 'span' ? m.span : m.div
-  if (still)
-    return as === 'span' ? <span className={className}>{children}</span> : <div className={className}>{children}</div>
 
   return (
     <LazyMotion features={domAnimation} strict>
@@ -104,9 +98,6 @@ export function Enter({
 
 /** One thing rising into place, for a heading or a panel rather than a list. */
 export function Rise({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
-  const still = useReducedMotion()
-  if (still) return <div className={className}>{children}</div>
-
   return (
     <LazyMotion features={domAnimation} strict>
       <m.div
@@ -128,13 +119,11 @@ export function Rise({ children, className, delay = 0 }: { children: ReactNode; 
 
 /** A spring, which CSS transitions cannot do; no movement at all when motion is not wanted. */
 export function Pop({ on, children, className }: { on: boolean; children: ReactNode; className?: string }) {
-  const still = useReducedMotion()
-  if (still) return <span className={className}>{children}</span>
-
   return (
     <LazyMotion features={domAnimation} strict>
       <m.span
         className={className}
+        data-pop
         // Keyed on the state, so the spring replays each time it flips rather than only on mount.
         key={String(on)}
         initial={{ scale: 0.55 }}

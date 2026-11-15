@@ -129,12 +129,27 @@ test('Products arrive one after another', async ({ browser }) => {
 
   const still = await browser.newContext({ viewport: { width: 1280, height: 900 }, reducedMotion: 'reduce' })
   const quiet = await still.newPage()
-  await open(quiet, '/shop')
-  check('reduced motion skips the animation entirely', (await quiet.locator('[data-stagger]').count()) === 0)
-  check(
-    'and shows the products at once',
-    (await quiet.evaluate(() => Number(getComputedStyle(document.querySelector('article')).opacity))) === 1,
-  )
+  const errors = []
+  quiet.on('pageerror', (error) => errors.push(error.message))
+  await quiet.addInitScript(() => {
+    window.__faintest = 1
+    const tick = () => {
+      document.querySelectorAll('[data-stagger]').forEach((node) => {
+        const box = node.getBoundingClientRect()
+        if (box.top < window.innerHeight && box.bottom > 0)
+          window.__faintest = Math.min(window.__faintest, Number(getComputedStyle(node).opacity))
+      })
+      requestAnimationFrame(tick)
+    }
+    requestAnimationFrame(tick)
+  })
+  for (const path of ['/', '/shop', '/products/ash-dining-table']) {
+    errors.length = 0
+    await open(quiet, path)
+    check(`reduced motion hydrates ${path} cleanly`, errors.length === 0, errors[0])
+    const faintest = await quiet.evaluate(() => window.__faintest)
+    check(`and nothing on ${path} fades in`, faintest === 1, `opacity ${faintest}`)
+  }
   await still.close()
 
   // A category is a new set of products, not the old ones relabeled, so the reveal plays again.
