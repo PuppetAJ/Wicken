@@ -1,5 +1,3 @@
-# The browser suites, on pull requests only. They build and boot the app, so this is slower than
-# ci.yml and is not a required check: main is gated by ci.yml alone.
 name: Browser suite
 
 on:
@@ -14,7 +12,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
-    # One runner per area, so the wall clock is the longest area rather than the sum of them all.
     strategy:
       fail-fast: false
       matrix:
@@ -37,7 +34,6 @@ jobs:
 
     env:
       DATABASE_URL: postgresql://wicken:wicken@127.0.0.1:5432/wicken
-      # The app runs as the restricted role here, as it does in production, so a missing grant fails a PR.
       APP_DATABASE_URL: postgresql://wicken_app:ci@127.0.0.1:5432/wicken
       BETTER_AUTH_SECRET: ci-secret-not-used-for-anything-real
       NEXT_PUBLIC_APP_URL: http://localhost:3000
@@ -54,7 +50,6 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      # Chromium is ~130MB and never changes between runs of the same Playwright version.
       - uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
@@ -62,7 +57,6 @@ jobs:
 
       - run: pnpm exec playwright install --with-deps chromium
 
-      # Next's own build cache; the fallback key means a source change still starts from something warm.
       - uses: actions/cache@v6
         with:
           path: .next/cache
@@ -73,10 +67,8 @@ jobs:
 
       - run: pnpm db:migrate
 
-      # The migration creates the role without a login; each environment gives it one.
       - run: psql "$DATABASE_URL" -c "ALTER ROLE wicken_app LOGIN PASSWORD 'ci'"
 
-      # The suites assert on real products and on the two demo accounts. Seeding is the owner's job.
       - run: pnpm db:seed
         env:
           APP_DATABASE_URL: ''
@@ -94,7 +86,6 @@ jobs:
 
       - run: pnpm exec playwright test e2e/${{ matrix.suite }}.spec.mjs
 
-      # The report and a failed test's trace and screenshot, to step through without rerunning.
       - if: failure()
         uses: actions/upload-artifact@v7
         with:
