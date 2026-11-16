@@ -44,14 +44,12 @@ export async function generateMetadata({ params }: PageProps<'/products/[slug]'>
   }
 }
 
-// Silences instant-navigation validation; it does not make the route answer 404 (D17).
 export const instant = false
 
 export default async function ProductPage({ params, searchParams }: PageProps<'/products/[slug]'>) {
   const product = await getProduct((await params).slug)
   if (!product) notFound()
 
-  // The same schema the shop parses, because these are the shop's own params riding along.
   const search = shopSearchSchema.parse(await searchParams)
   const reviewSort = reviewSortSchema.parse((await searchParams).reviews)
   const related = await getRelated(product, 12)
@@ -66,7 +64,6 @@ export default async function ProductPage({ params, searchParams }: PageProps<'/
         <Enter delay={0.05}>
           <Breadcrumbs search={search} category={product.category} name={product.name} />
         </Enter>
-        {/* The photograph leads and the words follow it down, the way the landing hero arrives. */}
         <div className="flex flex-col gap-12 lg:flex-row lg:gap-16">
           {product.image_url && (
             <Enter className="min-w-0 flex-1 self-start">
@@ -231,7 +228,6 @@ export default async function ProductPage({ params, searchParams }: PageProps<'/
   )
 }
 
-/** Request-time, so the cached product shell above is untouched by who is reading. */
 async function SaveControl({ productId, name }: { productId: number; name: string }) {
   const session = await getSession()
   const favorited = session ? (await listFavoriteIds(session.user.id)).includes(productId) : false

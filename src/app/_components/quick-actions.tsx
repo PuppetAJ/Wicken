@@ -8,7 +8,6 @@ import { Pop } from '@/components/motion'
 import { quickAdd } from '@/features/cart/actions'
 import { useFavorite } from '@/features/favorites/use-favorite'
 
-// Coarse pointers never hover, so the buttons stay visible; pointer-events-none or this eats card clicks.
 const shell =
   'pointer-events-none absolute inset-0 z-10 hidden items-center justify-center gap-3 transition-opacity pointer-fine:flex ' +
   'pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 pointer-fine:group-focus-within:opacity-100 ' +

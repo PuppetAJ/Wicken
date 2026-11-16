@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { Button } from '@/components/elements/button'
 import { resumePayment, type CheckoutState } from '../actions'
 
-/** An order left unpaid is otherwise a dead end: the cart it came from is already gone. */
 export function ResumePayment({ orderId, size = 'md' }: { orderId: number; size?: 'md' | 'lg' }) {
   const [state, action, pending] = useActionState<CheckoutState, FormData>(() => resumePayment(orderId), undefined)
   const router = useRouter()

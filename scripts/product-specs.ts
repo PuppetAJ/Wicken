@@ -1,5 +1,3 @@
-// Dimensions and materials come from the product; the rest is invented copy, not fact.
-
 export const productSpecs: Record<string, Record<string, Record<string, string>>> = {
   'ridge-breakfast-mug': {
     Measurements: {

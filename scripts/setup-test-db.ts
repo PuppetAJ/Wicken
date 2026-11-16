@@ -8,7 +8,6 @@ const parsed = new URL(url)
 const database = parsed.pathname.slice(1)
 if (!database.endsWith('_test')) throw new Error(`Refusing to use ${database}: a test database must end in _test`)
 
-// Connect to the maintenance database, since the target may not exist yet.
 const admin = new Client({ connectionString: new URL('/postgres', parsed).toString() })
 await admin.connect()
 const { rows } = await admin.query('SELECT 1 FROM pg_database WHERE datname = $1', [database])

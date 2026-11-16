@@ -29,7 +29,6 @@ export default function ShopPage({ searchParams }: PageProps<'/shop'>) {
           <p>Everything we make, plus the few things we buy in, in the batch that's here right now.</p>
         </Text>
       </div>
-      {/* searchParams is request data, so it is read below a boundary and the heading above prerenders. */}
       <Suspense fallback={<ShopSkeleton />}>
         <Results searchParams={searchParams} />
       </Suspense>
@@ -41,7 +40,6 @@ async function Results({ searchParams }: Pick<PageProps<'/shop'>, 'searchParams'
   const search = shopSearchSchema.parse(await searchParams)
   const [products, facets] = await Promise.all([getCatalog(search), getFacets()])
 
-  // One query for the whole grid rather than one per tile.
   const session = await getSession()
   const favorites = new Set(session ? await listFavoriteIds(session.user.id) : [])
   const ratings = await summarizeMany(products.map((product) => product.id))
@@ -51,7 +49,6 @@ async function Results({ searchParams }: Pick<PageProps<'/shop'>, 'searchParams'
   return (
     <div className="flex flex-col gap-10">
       <ShopToolbar search={search} count={products.length} facets={facets} />
-      {/* The sheet needs JavaScript to open, so without it the rail and the chips come back. */}
       <noscript>
         <style>
           {'[data-inline-filters="rail"]{display:block!important}' +
@@ -64,11 +61,9 @@ async function Results({ searchParams }: Pick<PageProps<'/shop'>, 'searchParams'
           <FacetFilters search={search} facets={facets} />
         </div>
         <div className="min-w-0">
-          {/* The filter rail carries the only other headings, and it is hidden below lg. */}
           <h2 className="sr-only">Products</h2>
           {products.length > 0 ? (
             <ProductGrid
-              // Keyed on the filters, so a new set of products arrives with its reveal unspent.
               key={state || 'all'}
               products={products}
               from={state}
@@ -116,7 +111,6 @@ function EmptyState({ query }: { query?: string }) {
   )
 }
 
-// Mirrors Results, so the rail and the grid land where the skeleton already put them.
 function ShopSkeleton() {
   return (
     <div className="flex flex-col gap-10">

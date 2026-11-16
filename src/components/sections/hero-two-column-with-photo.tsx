@@ -19,7 +19,6 @@ export function HeroTwoColumnWithPhoto({
   subheadline: ReactNode
   cta?: ReactNode
   photo?: ReactNode
-  // Fixes the photo at 13:10 beside the text and 3:2 once stacked, so a tablet is not all photograph.
   tallPhoto?: boolean
 } & ComponentProps<'section'>) {
   return (

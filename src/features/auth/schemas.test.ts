@@ -9,7 +9,6 @@ describe('safeNext', () => {
   })
 
   it('refuses anywhere off this site', () => {
-    // //evil.example is a protocol-relative URL, so the leading slash is not enough.
     for (const hostile of ['https://evil.example', '//evil.example', 'javascript:alert(1)', 'evil.example']) {
       assert.equal(safeNext(hostile), '/', `${hostile} must not be followed`)
     }

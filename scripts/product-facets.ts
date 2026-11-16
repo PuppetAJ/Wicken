@@ -1,8 +1,6 @@
-/** Derived by hand: "Ash top" is a wood and "wood ash glaze" is not, and no pattern tells those apart. */
 type Facets = { materials: string[]; color: string | null }
 
 export const productFacets: Record<string, Facets> = {
-  // Furniture: the wood is the material and the finish leaves it its own color.
   'ash-dining-table': { materials: ['ash', 'steel'], color: 'natural' },
   'elm-side-table': { materials: ['elm'], color: 'natural' },
   'low-workshop-stool': { materials: ['pine', 'reclaimed-wood'], color: 'natural' },
@@ -11,7 +9,6 @@ export const productFacets: Record<string, Facets> = {
   'oak-wall-shelf': { materials: ['oak'], color: 'natural' },
   'weathered-stool': { materials: ['reclaimed-wood'], color: 'natural' },
 
-  // Lighting.
   'bedside-lamp': { materials: ['stoneware', 'linen'], color: 'cream' },
   'column-table-lamp': { materials: ['linen', 'steel'], color: 'cream' },
   'fluted-pendant': { materials: ['porcelain', 'brass'], color: 'white' },
@@ -22,7 +19,6 @@ export const productFacets: Record<string, Facets> = {
   'stone-candle-set': { materials: ['stone', 'wax'], color: 'gray' },
   'taper-candle-holders': { materials: ['porcelain'], color: 'white' },
 
-  // Tableware.
   'ash-glaze-dinner-plate': { materials: ['stoneware'], color: 'cream' },
   'butter-dish': { materials: ['porcelain'], color: 'white' },
   'butter-glaze-plate': { materials: ['stoneware'], color: 'yellow' },
@@ -39,7 +35,6 @@ export const productFacets: Record<string, Facets> = {
   'teapot-trio': { materials: ['stoneware'], color: 'mixed' },
   'tumbler-set': { materials: ['stoneware'], color: 'cream' },
 
-  // Vases.
   'cobalt-column-vase': { materials: ['stoneware'], color: 'blue' },
   'harvest-vase': { materials: ['earthenware'], color: 'terracotta' },
   'oxblood-vase': { materials: ['porcelain'], color: 'red' },

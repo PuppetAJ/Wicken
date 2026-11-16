@@ -5,12 +5,10 @@ import { Scroller } from '@/components/elements/scroller'
 import { perPage } from '@/lib/db/queries/paging'
 import { Skeleton } from '@/components/ui/skeleton'
 
-/** A heading with an href sorts the list; `sorted` marks the column the list is sorted by now. */
 export type Column = string | { label: string; href: string; sorted?: 'asc' | 'desc' }
 
 const labelOf = (column: Column) => (typeof column === 'string' ? column : column.label)
 
-/** Shopify's resource index: one column, so the row keeps its horizontal space for data. */
 export function IndexTable({
   columns,
   children,
@@ -74,7 +72,6 @@ export function IndexTable({
 
 export { Cell, Row } from './table-row'
 
-/** A full page of rows, so waiting for one does not shorten the page and then stretch it back. */
 export function IndexTableSkeleton({ rows = perPage }: { rows?: number }) {
   return (
     <div className="overflow-hidden rounded-xl border border-olive-950/10 dark:border-white/10">

@@ -4,7 +4,6 @@ import { Container } from '@/components/elements/container'
 import { Logo } from '@/components/elements/logo'
 import { AdminNav } from '@/features/admin/components/admin-nav'
 
-// Chrome only: a layout serialises children into the payload, so each page checks the role itself.
 export default function AdminLayout({ children }: LayoutProps<'/admin'>) {
   return (
     <div className="flex min-h-dvh flex-col">
@@ -12,7 +11,6 @@ export default function AdminLayout({ children }: LayoutProps<'/admin'>) {
         <Container className="flex h-14 items-center justify-between gap-6">
           <div className="flex items-center gap-1.5">
             <Logo className="size-5 shrink-0 text-olive-950 dark:text-white" />
-            {/* The two words share a baseline; the mark is centered against them. */}
             <span className="flex items-baseline gap-2">
               <span className="font-display text-lg font-medium text-olive-950 dark:text-white">Wicken</span>
               <span className="text-sm text-olive-600 dark:text-olive-400">Admin</span>
@@ -29,7 +27,6 @@ export default function AdminLayout({ children }: LayoutProps<'/admin'>) {
         </Container>
       </header>
 
-      {/* Said once, at the top: the writes here are real, and the night takes them back. */}
       <div className="border-b border-amber-500/25 bg-amber-500/10 dark:bg-amber-400/10">
         <Container className="py-2.5">
           <p className="text-xs/5 text-amber-900 dark:text-amber-200">

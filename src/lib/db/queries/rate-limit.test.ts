@@ -29,7 +29,6 @@ describe('rate limiting', () => {
     await consume('action:test:1.1.1.1', { window: 60, max: 1 })
     assert.equal((await consume('action:test:1.1.1.1', { window: 60, max: 1 })).allowed, false)
 
-    // Backdate the window's start rather than waiting a minute for it to lapse.
     await pool.query('UPDATE rate_limits SET last_request = last_request - 61000')
 
     assert.equal((await consume('action:test:1.1.1.1', { window: 60, max: 1 })).allowed, true)

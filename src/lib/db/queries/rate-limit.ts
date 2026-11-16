@@ -3,7 +3,6 @@ import { pool } from '../pool.ts'
 
 type RateLimitResult = { allowed: boolean; retryAfter: number }
 
-// One statement, or concurrent attempts all pass the same stale count.
 export async function consume(key: string, { window, max }: { window: number; max: number }): Promise<RateLimitResult> {
   const now = Date.now()
   const windowStartedAfter = now - window * 1000

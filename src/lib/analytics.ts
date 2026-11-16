@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { eventNames } from './db/types'
 
-// A session id is opaque to us; the length bound is what the table's own CHECK enforces.
 export const trackedEvent = z.object({
   name: z.enum(eventNames),
   session: z.string().min(8).max(64),

@@ -6,18 +6,15 @@ import { env, googleEnabled } from '../env.ts'
 const roles = ['customer', 'admin'] as const
 export type Role = (typeof roles)[number]
 
-// Better Auth infers the field as plain `string`, so comparing here makes a mistyped role a type error.
 export function hasRole(user: { role?: string | null }, role: Role): boolean {
   return user.role === role
 }
 
-// Kept apart from ./index.ts and its Next plugin so the seed script can build an instance under Node.
 export const authOptions = {
   appName: 'Wicken',
   baseURL: env.APP_URL,
   secret: env.BETTER_AUTH_SECRET,
 
-  // The same pg pool the catalog queries use, so there is one connection budget.
   database: pool,
 
   emailAndPassword: {
@@ -47,7 +44,6 @@ export const authOptions = {
     modelName: 'users',
     fields: { emailVerified: 'email_verified', createdAt: 'created_at', updatedAt: 'updated_at' },
     additionalFields: {
-      // input: false, or the sign-up body could ask for role: 'admin'.
       role: { type: 'string', required: false, input: false, defaultValue: 'customer' },
     },
   },

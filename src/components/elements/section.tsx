@@ -21,9 +21,7 @@ export function Section({
   headline?: ReactNode
   subheadline?: ReactNode
   cta?: ReactNode
-  /** A closer rhythm, for a page of sections rather than one section on its own. */
   tight?: boolean
-  /** Arrives with whatever it introduces rather than sitting above an empty space. */
   reveal?: boolean
 } & ComponentProps<'section'>) {
   return (

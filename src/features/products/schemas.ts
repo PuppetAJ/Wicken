@@ -74,7 +74,6 @@ export const colorLabels: Record<(typeof colors)[number], string> = {
   mixed: 'Mixed',
 }
 
-// What each swatch shows. Approximate by nature: a glaze is not a hex code.
 export const colorSwatches: Record<(typeof colors)[number], string> = {
   white: '#f4f3ef',
   cream: '#e8e0cf',
@@ -89,7 +88,6 @@ export const colorSwatches: Record<(typeof colors)[number], string> = {
   mixed: 'conic-gradient(#e8e0cf 0deg 120deg, #b0674a 120deg 240deg, #2f4f7a 240deg 360deg)',
 }
 
-// Bands, not a slider: most of a $18 to $1,280 catalog is under $200, so a slider mostly travels empty.
 export const priceBands = ['under-50', '50-100', '100-200', 'over-200'] as const
 
 export const priceBandLabels: Record<(typeof priceBands)[number], string> = {
@@ -99,7 +97,6 @@ export const priceBandLabels: Record<(typeof priceBands)[number], string> = {
   'over-200': 'Over $200',
 }
 
-/** Inclusive of the lower bound, exclusive of the upper, in cents. */
 export const priceBandRanges: Record<(typeof priceBands)[number], [number, number | null]> = {
   'under-50': [0, 5000],
   '50-100': [5000, 10000],
@@ -116,15 +113,12 @@ export const sortLabels: Record<(typeof sorts)[number], string> = {
   name: 'Name, A to Z',
 }
 
-// Shared with the input, so a query the box accepts is never one the schema drops.
 export const searchMaxLength = 100
 
-// Search params are user-controlled, so every field falls back rather than throwing.
 export const shopSearchSchema = z.object({
   category: z.enum(categories).optional().catch(undefined),
   sort: z.enum(sorts).default('newest').catch('newest'),
   q: z.string().trim().min(1).max(searchMaxLength).optional().catch(undefined),
-  // Repeated params (?material=oak&material=ash) arrive as an array, one as a string.
   material: z
     .union([z.enum(materials), z.array(z.enum(materials))])
     .transform((value) => (Array.isArray(value) ? value : [value]))
@@ -144,7 +138,6 @@ export const shopSearchSchema = z.object({
 
 export type ShopSearch = z.infer<typeof shopSearchSchema>
 
-/** Builds a /shop URL, dropping defaults so the common case stays a clean path. */
 export function shopHref(search: Partial<ShopSearch>): string {
   const params = new URLSearchParams()
   if (search.category) params.set('category', search.category)
@@ -157,7 +150,6 @@ export function shopHref(search: Partial<ShopSearch>): string {
   return query ? `/shop?${query}` : '/shop'
 }
 
-/** The shop's filters as a query string to hang on a product link, so it can offer a way back. */
 export function fromShop(search: Partial<ShopSearch>): string {
   const href = shopHref(search)
   return href === '/shop' ? '' : `?${href.split('?')[1]}`

@@ -78,7 +78,6 @@ async function Rows({ filters }: { filters: z.infer<typeof search> }) {
         {orders.map((order) => (
           <LinkRow key={order.id} href={`/admin/orders/${order.id}`}>
             <Cell>
-              {/* Primary, with the customer as the kicker above it. */}
               <span className="block text-xs text-olive-600 dark:text-olive-400">{order.customer_name}</span>
               <Link
                 href={`/admin/orders/${order.id}`}

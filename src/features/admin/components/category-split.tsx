@@ -4,10 +4,8 @@ import { Cell, Label, Pie, PieChart } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import { formatPrice } from '@/lib/format'
 
-// Every slice sits against all three others, so these four are checked as all pairs, not neighbors.
 const slots = ['var(--chart-2)', 'var(--chart-3)', 'var(--chart-4)', 'var(--chart-5)']
 
-/** Labeled by the caller: a chart has no business knowing the catalog's vocabulary. */
 export function CategorySplitChart({ split }: { split: { label: string; revenue_cents: number }[] }) {
   const total = split.reduce((sum, row) => sum + row.revenue_cents, 0)
   const data = split.map((row, index) => ({
@@ -31,7 +29,6 @@ export function CategorySplitChart({ split }: { split: { label: string; revenue_
               <ChartTooltipContent hideLabel formatter={(value, name) => `${name}: ${formatPrice(Number(value))}`} />
             }
           />
-          {/* A donut, so the total can sit in the middle where it is actually read. */}
           <Pie data={data} dataKey="value" nameKey="name" innerRadius={52} outerRadius={80} strokeWidth={2}>
             {data.map((row) => (
               <Cell key={row.name} fill={row.fill} stroke="var(--color-background)" />
@@ -58,7 +55,6 @@ export function CategorySplitChart({ split }: { split: { label: string; revenue_
         </PieChart>
       </ChartContainer>
 
-      {/* The numbers in text, which is what makes the two low-contrast slices legible. */}
       <ul className="flex flex-1 flex-col gap-2">
         {data.map((row) => (
           <li key={row.name} className="flex items-center gap-2.5 text-sm">

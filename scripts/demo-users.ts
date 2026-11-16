@@ -3,10 +3,8 @@ import { authOptions } from '../src/lib/auth/options.ts'
 import { demoAccounts } from '../src/lib/auth/demo.ts'
 import { pool } from '../src/lib/db/pool.ts'
 
-// No nextCookies plugin: next/headers does not resolve under plain Node.
 const auth = betterAuth(authOptions)
 
-/** Replaces only the two demo rows, so a reseed does not log real visitors out. */
 export async function seedDemoUsers(): Promise<void> {
   const accounts = Object.values(demoAccounts)
   await pool.query('DELETE FROM users WHERE email = ANY($1)', [accounts.map((a) => a.email)])
@@ -15,7 +13,6 @@ export async function seedDemoUsers(): Promise<void> {
     await auth.api.signUpEmail({ body: account })
   }
 
-  // signUpEmail signs the new user in, and nobody is holding those cookies.
   await pool.query('DELETE FROM sessions WHERE user_id IN (SELECT id FROM users WHERE email = ANY($1))', [
     accounts.map((a) => a.email),
   ])

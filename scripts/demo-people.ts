@@ -1,6 +1,5 @@
 import type { PoolClient } from 'pg'
 
-/** Invented names, none able to sign in, shared by the review and order seeders so one person can be both. */
 export const people = [
   ['Marta Ellison', 'marta.ellison@wicken.test'],
   ['Joseph Ndiaye', 'joseph.ndiaye@wicken.test'],
@@ -16,10 +15,8 @@ export const people = [
   ['Idris Rahman', 'idris.rahman@wicken.test'],
 ] as const
 
-/** The first eight also write reviews; the rest only ever buy. */
 export const reviewerCount = 8
 
-/** Upserts the cast and returns their ids in the order above. */
 export async function ensurePeople(client: PoolClient): Promise<string[]> {
   const ids: string[] = []
   for (const [name, email] of people) {
@@ -35,7 +32,6 @@ export async function ensurePeople(client: PoolClient): Promise<string[]> {
   return ids
 }
 
-/** A small deterministic generator, so a reseed does not reshuffle the charts. */
 export function rolls(seed: number): () => number {
   let state = seed >>> 0
   return () => {

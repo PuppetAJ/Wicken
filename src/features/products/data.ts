@@ -11,13 +11,9 @@ import {
 import type { Product } from '@/lib/db/types'
 import { priceBandRanges, type ShopSearch } from './schemas'
 
-// Sits above src/lib/db, which must stay importable by plain Node for the tests and seed.
-
-// Takes the parsed search params whole, so the URL's `q` cannot drift from the query's `search`.
 export async function getCatalog({ category, sort, q, material, color, price }: ShopSearch): Promise<Product[]> {
   'use cache'
   cacheTag('products')
-  // Free text is unbounded, so a long life would pin one entry per query ever typed.
   if (q) cacheLife('seconds')
   else cacheLife('hours')
   return listProducts({
@@ -50,7 +46,6 @@ export async function getRelated(product: Product, limit = 4): Promise<Product[]
   'use cache'
   cacheLife('hours')
   cacheTag('products')
-  // The query orders at random; caching freezes one roll per product, which is what we want.
   return listRelatedProducts(product, limit)
 }
 

@@ -7,12 +7,10 @@ import { getCategoryCovers } from '@/features/products/data'
 import { focalPosition } from '@/features/products/focal'
 import { categoryLabels } from '@/features/products/schemas'
 
-// Landscape tiles with the name on the photograph, so the strip is a way through, not a second grid.
 const grid = 'grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6'
 const tile = 'relative aspect-4/3 overflow-hidden rounded-xl bg-tile'
 const sizes = '(min-width: 1280px) 195px, (min-width: 1024px) 16vw, (min-width: 640px) 31vw, 47vw'
 
-/** The way into the catalog for somebody who does not yet know what they want. */
 export async function Categories() {
   const covers = await getCategoryCovers()
 
@@ -43,7 +41,6 @@ export async function Categories() {
                     className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none motion-reduce:group-hover:scale-100"
                   />
                 )}
-                {/* A wash, not a flat overlay, so the name stays legible over pale and dark alike. */}
                 <div className="absolute inset-0 bg-linear-to-t from-black/65 via-black/10 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 flex items-baseline justify-between gap-2 p-3">
                   <span className="text-sm font-medium text-white">{categoryLabels[cover.category]}</span>

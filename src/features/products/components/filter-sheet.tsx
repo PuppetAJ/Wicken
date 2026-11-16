@@ -16,7 +16,6 @@ import {
 import type { ShopSearch } from '../schemas'
 import { FacetFilters } from './facet-filters'
 
-/** Every filter behind one button where the rail would stack above the products, chips included. */
 export function FilterSheet({
   search,
   facets,

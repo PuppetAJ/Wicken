@@ -31,7 +31,6 @@ export function FooterWithLinkCategories({
 }: {
   links: ReactNode
   fineprint: ReactNode
-  /** A row above the links, for the one thing the footer asks of a visitor. */
   notice?: ReactNode
 } & ComponentProps<'footer'>) {
   return (

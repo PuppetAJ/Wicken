@@ -5,7 +5,6 @@ import { useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { removeReview, type AdminState } from '../actions'
 
-/** The one destructive action kept: a review is the thing a shop genuinely has to moderate. */
 export function ReviewRemover({ userId, productId, author }: { userId: string; productId: number; author: string }) {
   const [state, action, pending] = useActionState<AdminState, FormData>(removeReview, undefined)
 

@@ -110,7 +110,6 @@ describe('filtering by material and color', () => {
 
     assert.ok(materials.includes('stoneware'))
     assert.ok(colors.includes('natural'))
-    // Nothing is black, so it must not be offered even though the vocabulary allows it.
     assert.ok(!colors.includes('black'))
   })
 
@@ -150,7 +149,6 @@ describe('filtering by price band', () => {
 
   it('excludes the upper bound and includes the lower', async () => {
     await priced()
-    // cheap is 3000 and reduced costs 4000; mid is exactly 7000 and so falls outside.
     const found = await listProducts({ priceRanges: [[3000, 7000]] })
     assert.deepEqual(found.map((p) => p.slug).sort(), ['cheap', 'reduced'])
     assert.ok(!found.some((p) => p.slug === 'mid'), '7000 is the exclusive upper bound')

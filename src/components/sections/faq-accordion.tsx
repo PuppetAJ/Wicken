@@ -3,7 +3,6 @@ import { Container } from '@/components/elements/container'
 import { Subheading } from '@/components/elements/subheading'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 
-// Replaces Oatmeal's faqs-two-column-accordion, which used @tailwindplus/elements; one column, not two.
 export function FaqAccordion({
   headline,
   icon,
@@ -13,7 +12,6 @@ export function FaqAccordion({
   headline: ReactNode
   icon?: ReactNode
   items: { question: string; answer: ReactNode }[]
-  /** Set where the footer links straight to one group, so the heading clears the header. */
   id?: string
 }) {
   return (

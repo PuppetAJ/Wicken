@@ -2,7 +2,6 @@
 
 import { useId } from 'react'
 
-/** Off screen rather than hidden, because a script reads the styles too rarely to notice. */
 export function Honeypot() {
   const id = useId()
 

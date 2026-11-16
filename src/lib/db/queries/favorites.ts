@@ -2,7 +2,6 @@ import 'server-only'
 import { pool } from '../pool.ts'
 import type { Product } from '../types.ts'
 
-/** Returns true if it is now a favorite, false if the second press removed it. */
 export async function toggleFavorite(userId: string, productId: number): Promise<boolean> {
   const { rowCount } = await pool.query('DELETE FROM favorites WHERE user_id = $1 AND product_id = $2', [
     userId,

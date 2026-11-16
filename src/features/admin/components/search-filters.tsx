@@ -7,7 +7,6 @@ import { useDebouncedQuery } from '@/components/use-debounced-query'
 
 const LIMIT = 100
 
-/** The admin's copy of the shop's search box, over whichever selects the list needs. */
 export function SearchFilters({
   action,
   placeholder,
@@ -19,7 +18,6 @@ export function SearchFilters({
   placeholder: string
   defaults: { q?: string }
   selects?: { name: string; label: string; value?: string; options: { value: string; label: string }[] }[]
-  // Carried along unchanged, so filtering does not drop a sort the list is already in.
   hidden?: Record<string, string | undefined>
 }) {
   const form = useRef<HTMLFormElement>(null)
@@ -30,7 +28,6 @@ export function SearchFilters({
     applied: defaults.q ?? '',
     maxLength: LIMIT,
     build: (wanted) => {
-      // Read at fire time, so whatever the selects hold now rides along with the query.
       const search = new URLSearchParams()
       if (form.current) {
         for (const [key, entry] of new FormData(form.current).entries()) {
@@ -90,7 +87,6 @@ export function SearchFilters({
       <span aria-live="polite" className="sr-only">
         {pending ? 'Filtering' : ''}
       </span>
-      {/* Only reachable without JavaScript; typing already navigates otherwise. */}
       <noscript>
         <button
           type="submit"

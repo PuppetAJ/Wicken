@@ -3,7 +3,6 @@ import { getSession } from '@/lib/auth/session'
 import { AccountDropdown } from './account-dropdown'
 import { SignedOutLinks } from './signed-out-links'
 
-/** Request-time, so the header wraps it in Suspense and the rest of the chrome stays cacheable. */
 export async function AccountMenu() {
   const session = await getSession()
 
@@ -18,7 +17,6 @@ export function AccountMenuFallback() {
   return <div className="h-9 w-24 animate-pulse rounded-full bg-olive-950/5 dark:bg-white/5" aria-hidden />
 }
 
-/** The sheet's copy of the signed-out links. Signed in, the avatar in the header is enough. */
 export async function SheetAccount() {
   const session = await getSession()
   if (session) return null

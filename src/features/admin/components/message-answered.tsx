@@ -5,7 +5,6 @@ import { useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { answerMessage, type AdminState } from '../actions'
 
-/** Marks a message dealt with, which is the only state a message has. */
 export function MessageAnswered({ id, answered, from }: { id: number; answered: boolean; from: string }) {
   const [state, action, pending] = useActionState<AdminState, FormData>(answerMessage, undefined)
 

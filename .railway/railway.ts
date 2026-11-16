@@ -2,7 +2,6 @@ import { defineRailway, github, postgres, preserve, project, service } from 'rai
 
 /** Every service must be listed and named as the dashboard names it: an omission reads as a deletion. */
 export default defineRailway(() => {
-  // Deploy only once GitHub's checks have passed.
   const repository = github('PuppetAJ/Wicken', { checkSuites: true })
 
   const database = postgres('Postgres')
@@ -10,13 +9,10 @@ export default defineRailway(() => {
   const app = service('Wicken', {
     source: repository,
     build: 'pnpm build',
-    // Migrations are idempotent and the seed only runs on an empty catalog, so a fresh
-    // environment comes up populated without anyone having to go and press anything.
     start: 'pnpm db:migrate && pnpm db:seed:empty && pnpm start',
     deploy: {
       healthcheckPath: '/api/health',
       healthcheckTimeout: 100,
-      // Stops after ten idle minutes and wakes on the next request, so idle hours are not billed.
       sleepApplication: true,
       numReplicas: 1,
     },
@@ -24,14 +20,11 @@ export default defineRailway(() => {
       NODE_ENV: 'production',
       PORT: '8080',
       NEXT_PUBLIC_APP_URL: 'https://wicken.up.railway.app',
-      // Railway resolves this to the database's own connection string; migrating and seeding run as its owner.
       DATABASE_URL: '${{Postgres.DATABASE_URL}}',
-      // The running app connects as the restricted role the migrations create; only its password is a secret.
       APP_DATABASE_URL:
         'postgresql://wicken_app:${{Wicken.APP_DATABASE_PASSWORD}}@${{Postgres.PGHOST}}:${{Postgres.PGPORT}}/${{Postgres.PGDATABASE}}',
-      // Letters and digits only: it is spliced into the URL above, where + and / break parsing.
+      // Letters and digits only: it is spliced into the URL above, where a / breaks parsing.
       APP_DATABASE_PASSWORD: preserve(),
-      // Set in the dashboard and never in this file; listed so applying does not delete them.
       BETTER_AUTH_SECRET: preserve(),
       STRIPE_SECRET_KEY: preserve(),
       STRIPE_WEBHOOK_SECRET: preserve(),
@@ -40,20 +33,17 @@ export default defineRailway(() => {
     },
   })
 
-  // The demo admin writes for real, so a nightly 04:00 UTC run puts the shop back.
   const reset = service('Reset', {
     source: repository,
     build: 'pnpm install --frozen-lockfile',
     start: 'pnpm db:migrate && pnpm db:seed',
     deploy: {
       cronSchedule: '0 4 * * *',
-      // A failed run waits for the next schedule rather than looping.
       restartPolicyType: 'NEVER',
     },
     env: {
       NODE_ENV: 'production',
       DATABASE_URL: '${{Postgres.DATABASE_URL}}',
-      // The seed loads the app's environment module, which refuses to start without this.
       BETTER_AUTH_SECRET: '${{Wicken.BETTER_AUTH_SECRET}}',
     },
   })

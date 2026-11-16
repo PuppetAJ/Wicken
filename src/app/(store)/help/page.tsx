@@ -68,7 +68,6 @@ export default function HelpPage() {
         </Container>
       </section>
 
-      {/* A card each, so the three groups are visible at a glance rather than found by scrolling. */}
       <section className="py-8">
         <Container>
           <div className="grid gap-4 sm:grid-cols-2">
@@ -112,7 +111,6 @@ export default function HelpPage() {
               </Text>
             </div>
 
-            {/* The session only prefills the fields, so the form renders for everybody either way. */}
             <Suspense fallback={<ContactForm waiting />}>
               <PrefilledForm />
             </Suspense>

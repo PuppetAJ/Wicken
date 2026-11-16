@@ -11,12 +11,10 @@ import type { CartItem } from '@/lib/db/types'
 import { getSession } from '@/lib/auth/session'
 import { readCartCookie, writeCartCookie } from '@/lib/cart/cookie'
 
-/** Read-only, because a render cannot set a cookie; nothing is created here. */
 async function currentCartId(): Promise<string | null> {
   const session = await getSession()
   if (session) return getCartIdForUser(session.user.id)
 
-  // isGuestCart, not cartExists: once an account claims a cart, the old cookie must stop working.
   const cookieId = await readCartCookie()
   return cookieId && (await isGuestCart(cookieId)) ? cookieId : null
 }
@@ -31,7 +29,6 @@ export async function getCartCount(): Promise<number> {
   return cartId ? countCartItems(cartId) : 0
 }
 
-/** Creates on demand, so only a Server Action or Route Handler may call it. */
 export async function resolveCartId(): Promise<string> {
   const session = await getSession()
   if (session) {

@@ -2,7 +2,6 @@ import { getCart } from '../cart'
 import { CartLines } from './cart-lines'
 import { CartLink } from './cart-link'
 
-/** Server-rendered into the sheet, so the cart is never fetched from the client. */
 export async function CartContents() {
   const items = await getCart()
 

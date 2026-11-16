@@ -5,7 +5,6 @@ import { ReviewForm } from './review-form'
 import { ReviewList } from './review-list'
 import { Stars } from './stars'
 
-// Request-time, because it depends on who is reading; the cached product shell above is not.
 export async function ProductReviews({ productId, slug, sort }: { productId: number; slug: string; sort: ReviewSort }) {
   const session = await getSession()
   const [reviews, own] = await Promise.all([
@@ -24,7 +23,6 @@ export async function ProductReviews({ productId, slug, sort }: { productId: num
   )
 }
 
-/** Sits by the price, where a rating is actually used, rather than only far below. */
 export async function RatingSummary({ productId }: { productId: number }) {
   const { count, average } = await summarizeReviews(productId)
   if (count === 0) return null

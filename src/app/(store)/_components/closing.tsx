@@ -8,7 +8,6 @@ import { Text } from '@/components/elements/text'
 import { Rise } from '@/components/motion'
 import { NewsletterForm } from '@/features/newsletter/components/newsletter-form'
 
-// The landing page's last word, and on phones the full-bleed top of the footer's own band.
 export function Closing() {
   return (
     <section data-closing className="py-10 max-sm:pb-0 sm:py-14">

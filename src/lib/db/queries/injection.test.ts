@@ -8,7 +8,6 @@ import { listAdminProducts, listAllReviews, listCustomers } from './admin.ts'
 after(() => pool.end())
 beforeEach(resetDatabase)
 
-// Each payload checks both that the catalog survives it and that it still answers honestly.
 const payloads = [
   "'; DROP TABLE products; --",
   "' OR '1'='1",
@@ -47,14 +46,12 @@ describe('hostile input reaches the database as a value, never as SQL', () => {
   })
 
   it('treats a payload as text rather than a pattern', async () => {
-    // A bare % would match everything if the value were pasted into the LIKE rather than bound.
     await insertProduct({ name: 'Ridge Mug' })
     await insertProduct({ name: 'Ash Plate' })
     assert.equal((await listProducts({ search: '%' })).length, 0, 'a wildcard is a literal percent sign')
     assert.equal((await listProducts({ search: '_' })).length, 0)
   })
 
-  /** The sort clause is the only assembled SQL, so its frozen map must not be walkable by prototype. */
   it('refuses a sort it does not recognize instead of splicing it in', async () => {
     await insertProduct({ name: 'Ridge Mug' })
 

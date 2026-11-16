@@ -32,7 +32,6 @@ export function OrderMover({ orderId, status }: { orderId: number; status: Order
       <Button type="submit" disabled={pending}>
         {pending ? 'Saving…' : 'Save'}
       </Button>
-      {/* Refunds move real money at Stripe and a nightly reseed cannot take one back. */}
       <p className="w-full text-xs text-olive-600 dark:text-olive-400">
         Refunds are disabled on the demo. Marking an order paid here does not charge anybody.
       </p>

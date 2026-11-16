@@ -5,7 +5,6 @@ import { useState, useTransition } from 'react'
 import { toast } from 'sonner'
 import { toggle } from './actions'
 
-/** Flips straight away and puts it back if the server disagrees, so the heart never lags a click. */
 export function useFavorite(productId: number, name: string, initial: boolean) {
   const [isFavorite, setIsFavorite] = useState(initial)
   const [pending, start] = useTransition()
@@ -22,7 +21,6 @@ export function useFavorite(productId: number, name: string, initial: boolean) {
         return
       }
       setIsFavorite(Boolean(result?.favorited))
-      // The favorites page is a list of exactly these, so removing one has to drop the tile.
       router.refresh()
     })
   }

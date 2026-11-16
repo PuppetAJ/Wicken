@@ -3,7 +3,6 @@ import { ensurePeople, rolls } from './demo-people.ts'
 
 const DAYS = 90
 
-/** Ninety days of invented orders, deterministic so a reseed does not move a figure somebody is reading. */
 export async function seedDemoOrders(): Promise<number> {
   const client = await pool.connect()
   try {
@@ -28,7 +27,6 @@ export async function seedDemoOrders(): Promise<number> {
 
     const roll = rolls(20260920)
     let written = 0
-    // Built up as we go and inserted in one statement at the end, rather than a round trip per row.
     const events: {
       name: string
       session: string
@@ -42,18 +40,15 @@ export async function seedDemoOrders(): Promise<number> {
       const day = new Date()
       day.setUTCDate(day.getUTCDate() - back)
       const weekend = day.getUTCDay() === 0 || day.getUTCDay() === 6
-      // Trade grows a little over the window and weekends are quiet, like a small studio's week.
       const growth = 0.6 + (1 - back / DAYS) * 0.8
       const howMany = Math.floor(roll() * (weekend ? 2 : 4) * growth)
 
-      // Sessions land where a small shop's do: most look at nothing, a few fill a cart, fewer reach Stripe.
       const sessions = Math.round((8 + roll() * 22) * growth)
       for (let visit = 0; visit < sessions; visit++) {
         const session = `seed-${back}-${visit}-${Math.floor(roll() * 1e6)}`
         const at = new Date(day)
         at.setUTCHours(7 + Math.floor(roll() * 15), Math.floor(roll() * 60), 0, 0)
         const product = catalog[Math.floor(roll() * catalog.length)]
-        // Most browsing is anonymous, which is the honest split for a shop this size.
         const userId = roll() < 0.35 ? people[Math.floor(roll() * people.length)] : null
 
         events.push({ name: 'view', session, path: roll() < 0.5 ? '/' : '/shop', productId: null, at, userId })
@@ -99,7 +94,6 @@ export async function seedDemoOrders(): Promise<number> {
         }))
         const total = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0)
 
-        // A few stalled and a few were called off, so the status filters have something to show.
         const fate = roll()
         const status = fate < 0.86 ? 'paid' : fate < 0.95 ? 'pending' : 'canceled'
 
@@ -130,10 +124,8 @@ export async function seedDemoOrders(): Promise<number> {
             ],
           )
         }
-        // A sale is a session that got all the way through, so it gets one of its own.
         if (status === 'paid') {
           const session = `seed-buy-${back}-${n}`
-          // A sale is always attributable: checkout requires an account.
           const buyer = rows[0]
             ? await client.query<{ user_id: string }>('SELECT user_id FROM orders WHERE id = $1', [rows[0].id])
             : null

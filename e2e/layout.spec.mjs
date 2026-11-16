@@ -1,7 +1,5 @@
-// How the site behaves at a phone width, and the motion that arrives with it. Needs a seeded database.
 import { BASE, check, freshPage, open, signInAsDemo, test } from './lib.mjs'
 
-/** The stagger is the one thing here that really takes time; wait for it to finish rather than guess. */
 async function settledTiles(page) {
   await page
     .waitForFunction(
@@ -19,7 +17,6 @@ async function settledTiles(page) {
 }
 
 test('Nothing scrolls sideways on a phone', async ({ browser }) => {
-  // 320px is the narrowest phone still in use; a document wider than its viewport slides under the thumb.
   const context = await browser.newContext({ viewport: { width: 320, height: 900 } })
   const narrow = await context.newPage()
   narrow.setDefaultTimeout(20_000)
@@ -63,7 +60,6 @@ test('Nothing scrolls sideways on a phone', async ({ browser }) => {
 
 test('Products arrive one after another', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
-  // Recorded as it happens: one sample cannot tell a tile that has finished from one that never started.
   await shop.addInitScript(() => {
     window.__began = new Map()
     const from = performance.now()
@@ -80,13 +76,11 @@ test('Products arrive one after another', async ({ browser }) => {
   await shop.waitForFunction(() => (window.__began?.size ?? 0) >= 8, null, { timeout: 20_000 }).catch(() => {})
 
   const began = await shop.evaluate(() => [...window.__began.entries()].slice(0, 8).map(([, at]) => at))
-  // The step is 60ms, so 40ms on average leaves a slower CI runner room and still proves the spacing.
   check(
     'they do not all appear at once',
     began.length >= 4 && began.at(-1) - began[0] >= (began.length - 1) * 40,
     began.join(' '),
   )
-  // The fifth tile starts behind the fourth, not alongside the first as a column-counted delay would.
   check(
     'and each one waits for the one before it',
     began.every((at, index) => index === 0 || at >= began[index - 1]),
@@ -94,7 +88,6 @@ test('Products arrive one after another', async ({ browser }) => {
   )
 
   await settledTiles(shop)
-  // Fully on screen: a tile hanging off the bottom edge is below the threshold that starts it.
   const onScreen = await shop.evaluate(() =>
     [...document.querySelectorAll('[data-stagger]')]
       .filter((n) => {
@@ -121,7 +114,6 @@ test('Products arrive one after another', async ({ browser }) => {
   check('and scrolling reveals the rest', all.length > 40 && all.every((o) => o === 1), `${all.length} tiles`)
   await context.close()
 
-  // The animation is a flourish: the markup has to be complete without it.
   const html = await (await fetch(`${BASE}/shop`)).text()
   const articles = (html.match(/<article/g) ?? []).length
   check('the tiles are server-rendered, not animated into being', articles > 40, `${articles} in the html`)
@@ -152,7 +144,6 @@ test('Products arrive one after another', async ({ browser }) => {
   }
   await still.close()
 
-  // A category is a new set of products, not the old ones relabeled, so the reveal plays again.
   const { context: swapped, page: swap } = await freshPage(browser)
   await swap.goto(`${BASE}/shop`, { waitUntil: 'domcontentloaded' })
   await settledTiles(swap)
@@ -178,7 +169,6 @@ test('Products arrive one after another', async ({ browser }) => {
 })
 
 test('A phone at its narrowest', async ({ browser }) => {
-  // 320px, with a cart that has something in it: an empty cart hides every layout problem.
   const context = await browser.newContext({ viewport: { width: 320, height: 720 } })
   const tiny = await context.newPage()
   tiny.setDefaultTimeout(20_000)
@@ -195,7 +185,6 @@ test('A phone at its narrowest', async ({ browser }) => {
     await open(tiny, path)
     const width = await tiny.evaluate(() => document.documentElement.scrollWidth)
     check(`${label} fits`, width <= 321, `${width}px`)
-    // Anything inside a sideways scroller is meant to be off screen, so it does not count.
     const past = await tiny.evaluate(
       () =>
         [...document.querySelectorAll('a,button,input,select')].filter((node) => {
@@ -215,7 +204,6 @@ test('A phone at its narrowest', async ({ browser }) => {
   await fits('checkout', '/checkout')
   await fits('a product', '/products/spouted-pendant')
 
-  // Three controls that have to stack rather than leave the heart stranded beside a wrapped form.
   const heart = await tiny.locator('[data-favorite="product"]').boundingBox()
   const buy = await tiny.getByRole('button', { name: 'Add to cart' }).boundingBox()
   check(
@@ -225,9 +213,7 @@ test('A phone at its narrowest', async ({ browser }) => {
   )
   check('and Add to cart has the next line to itself', buy.width > 240, `${Math.round(buy.width)}px wide`)
 
-  // One column, because two at this width is 140px of photograph.
   await open(tiny, '/shop')
-  // The grid's own column count: a tile waiting to be scrolled to is scaled down, so measured edges lie.
   const columns = await tiny.evaluate(() => {
     let node = document.querySelector('article')
     while (node && getComputedStyle(node).display !== 'grid') node = node.parentElement
@@ -235,7 +221,6 @@ test('A phone at its narrowest', async ({ browser }) => {
   })
   check('the shop drops to one column', columns === 1, `${columns} columns`)
 
-  // At this width the rail would stack three lists above the products and fill most of the screen.
   check('the filter rail is out of the way', await tiny.locator('[data-inline-filters="rail"]').isHidden())
   await tiny.getByRole('button', { name: /^Filters/ }).click()
   const sheet = tiny.locator('[data-slot="sheet-content"]')
@@ -255,7 +240,6 @@ test('A phone at its narrowest', async ({ browser }) => {
 })
 
 test('The menu knows when its button has gone', async ({ browser }) => {
-  // An iPad turning to landscape crosses lg, and used to be left with the sheet open over the desktop layout.
   const context = await browser.newContext({ viewport: { width: 800, height: 900 } })
   const tablet = await context.newPage()
   await tablet.goto(`${BASE}/`, { waitUntil: 'networkidle' })

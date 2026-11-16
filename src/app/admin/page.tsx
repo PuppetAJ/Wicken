@@ -17,7 +17,6 @@ import { AdminHeading } from '@/features/admin/components/admin-heading'
 
 export const metadata = { title: 'Admin' }
 
-// Silences instant-navigation validation for the session read; the status code is settled before the check.
 export const instant = false
 
 export default async function Page({ searchParams }: PageProps<'/admin'>) {
@@ -61,7 +60,6 @@ async function Figures({ range }: { range: '7' | '30' | '90' }) {
     visitorsBetween(from, to),
   ])
 
-  // Spelled out in every row, so nobody has to remember which period is selected.
   const since = formatDay(from)
   const conversion = funnel.sessions > 0 ? (funnel.purchases / funnel.sessions) * 100 : 0
   const wasConversion = wasFunnel.sessions > 0 ? (wasFunnel.purchases / wasFunnel.sessions) * 100 : 0
@@ -113,7 +111,6 @@ async function Figures({ range }: { range: '7' | '30' | '90' }) {
         {visitors.known === 0 ? (
           <Empty>No signed-in shopper looked at anything in this period.</Empty>
         ) : (
-          // Every row carries its own denominator, and this is the one panel counting people, not visits.
           <ul className="flex flex-col gap-4">
             {[
               {

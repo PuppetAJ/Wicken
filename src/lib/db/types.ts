@@ -20,21 +20,17 @@ export type Product = {
   description: string
   category: Category
   price_cents: number
-  /** Null unless on sale; the effective price is COALESCE(sale_price_cents, price_cents). */
   sale_price_cents: number | null
   stock_quantity: number
   dimensions: string | null
   materials: string | null
-  /** Grouped rows for the details table: group name to label to value. */
   specs: Record<string, Record<string, string>>
   image_url: string | null
   is_featured: boolean
-  /** Null when we made it ourselves; otherwise the workshop it came from. */
   made_by: Maker | null
   created_at: Date
 }
 
-/** A cart row joined to its product, which is what every cart view needs. */
 export type CartItem = {
   product_id: number
   slug: string

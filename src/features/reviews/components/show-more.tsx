@@ -2,7 +2,6 @@
 
 import { Children, useState, type ReactNode } from 'react'
 
-/** Children arrive server-rendered, so expanding fetches nothing; thousands would need real paging. */
 export function ShowMore({ initial, noun, children }: { initial: number; noun: string; children: ReactNode }) {
   const items = Children.toArray(children)
   const [all, setAll] = useState(false)

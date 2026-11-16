@@ -13,7 +13,6 @@ const description =
   'Ceramics and wood from a small studio, plus a few things from workshops we trust. Made in small batches.'
 
 export const metadata: Metadata = {
-  // Without this every relative image in a share card resolves against localhost.
   metadataBase: new URL(env.APP_URL),
   title: { default: 'Wicken', template: '%s · Wicken' },
   description,
@@ -41,7 +40,6 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
     >
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          {/* Above every layout, because the root not-found renders the header too. */}
           <CartOpenProvider>
             {children}
             <Toaster />

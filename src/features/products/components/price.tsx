@@ -1,7 +1,6 @@
 import type { Product } from '@/lib/db/types'
 import { formatPrice } from '@/lib/format'
 
-/** One place that decides what a price looks like, on sale or not. */
 export function Price({ product, size = 'sm' }: { product: Product; size?: 'sm' | 'lg' }) {
   const onSale = product.sale_price_cents !== null
   const big = size === 'lg'

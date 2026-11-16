@@ -1,4 +1,3 @@
-// axe-core at WCAG 2.1 A and AA, both themes. Needs the app running.
 import { createRequire } from 'node:module'
 import { BASE, check, signInAsDemo, test } from './lib.mjs'
 
@@ -21,7 +20,6 @@ const signedOut = [
   ['not found', '/definitely-not-a-page'],
 ]
 
-// Signed-in chrome is a different header, so it gets its own pass.
 const signedIn = [
   ['landing, signed in', '/'],
   ['checkout', '/checkout'],
@@ -47,7 +45,6 @@ async function audit(page, label, path) {
   } else {
     await page.goto(BASE + path, { waitUntil: 'networkidle' })
   }
-  // Contrast is measured on the resting state; caught mid-fade every color on a tile reads as failing.
   await page
     .waitForFunction(
       // axe reads a fully transparent tile as invisible, so nothing may be caught part way.

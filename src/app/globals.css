@@ -2,7 +2,6 @@
 @import 'tw-animate-css';
 @import 'shadcn/tailwind.css';
 
-/* Matches the .dark element itself as well as its descendants, so html.dark styles apply. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 @theme {
@@ -24,7 +23,6 @@
   --font-display--font-variation-settings: 'wdth' 112.5;
   --font-heading: var(--font-mona);
   --font-sans: var(--font-inter);
-  /* Ground that product photography sits on, so it reads as deliberate in both themes. */
   --color-tile: var(--tile);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
@@ -84,9 +82,7 @@
   --accent: var(--color-olive-200);
   --accent-foreground: var(--color-olive-950);
   --destructive: oklch(0.577 0.245 27.325);
-  /* Terracotta: olive is too close to grey to carry data. Each step checked on its own surface. */
   --chart-1: #a85c3e;
-  /* Four categories on one pie touch every other slice, so these are checked all-pairs. */
   --chart-2: #2a78d6;
   --chart-3: #eda100;
   --chart-4: #e87ba4;
@@ -143,7 +139,6 @@
 }
 
 @utility scroll-hint {
-  /* --scroll-hint comes from the element's own scroll position, so the fade goes once nothing is past it. */
   scrollbar-width: none;
   mask-image: linear-gradient(
     to right,
@@ -177,7 +172,6 @@
   }
 }
 
-/* The landing page's card is the same band as the footer, so on phones a rule is the only join. */
 @media (width < 40rem) {
   body:has([data-closing]) footer {
     padding-top: 0;
@@ -190,7 +184,6 @@
   }
 }
 
-/* That card already asks for an email, so the footer does not ask a second time on the same page. */
 body:has([data-closing]) [data-footer-notice] {
   display: none;
 }

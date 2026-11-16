@@ -7,7 +7,6 @@ import { useRef, useState, type MouseEvent } from 'react'
 
 const magnification = 2.2
 
-/** Hover magnifies under the cursor; clicking opens the frame the square tile crops. */
 export function ProductImage({ src, alt, objectPosition }: { src: string; alt: string; objectPosition: string }) {
   const frame = useRef<HTMLButtonElement>(null)
   const [origin, setOrigin] = useState<string | null>(null)
@@ -27,14 +26,12 @@ export function ProductImage({ src, alt, objectPosition }: { src: string; alt: s
         aria-label={`View ${alt} larger`}
         onMouseMove={track}
         onMouseLeave={() => setOrigin(null)}
-        // self-start, or the flex row stretches it and the accordion expanding grows the photograph.
         className="relative aspect-square w-full flex-1 cursor-zoom-in self-start overflow-hidden rounded-xl bg-tile focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
       >
         <Image
           src={src}
           alt={alt}
           fill
-          // The magnifier samples at 2.2x, and the lightbox opens the same asset, so it is one download.
           sizes="(min-width: 1024px) 1600px, 100vw"
           priority
           style={{

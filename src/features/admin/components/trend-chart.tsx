@@ -4,7 +4,6 @@ import { Area, AreaChart, CartesianGrid, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from '@/components/ui/chart'
 import { formatCount, formatDayShort } from '@/lib/format'
 
-/** Two charts sharing an x-axis rather than one with two y-axes, which makes a chart say untrue things. */
 export function TrendChart({
   data,
   dataKey,
@@ -29,7 +28,6 @@ export function TrendChart({
             <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0.02} />
           </linearGradient>
         </defs>
-        {/* Recessive: the grid is a reading aid, not a thing to look at. */}
         <CartesianGrid vertical={false} stroke="var(--chart-grid)" />
         <XAxis
           dataKey="day"

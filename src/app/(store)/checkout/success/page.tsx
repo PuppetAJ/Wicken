@@ -27,7 +27,6 @@ export default async function Page({ searchParams }: PageProps<'/checkout/succes
   )
 }
 
-// Payment is granted by the webhook or by asking Stripe directly; nothing here trusts the browser.
 async function Confirmation({ sessionId }: { sessionId?: string }) {
   const user = await requireUser()
   let order = sessionId ? await getOrderByStripeSession(sessionId, user.id) : null

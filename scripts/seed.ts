@@ -8,7 +8,6 @@ import { products } from './catalog.ts'
 import { productFacets } from './product-facets.ts'
 import { productSpecs } from './product-specs.ts'
 
-// Anything with clay or wood in it we made; the rest is the work of one of the three workshops.
 const ourOwn = ['stoneware', 'porcelain', 'earthenware', 'oak', 'ash', 'elm', 'pine', 'walnut', 'reclaimed-wood']
 
 function whoMadeIt(materials: string[]): string | null {
@@ -51,7 +50,6 @@ try {
     ])
   }
 
-  // A few things on sale, so the badge and the struck-through price are visible.
   await client.query(`UPDATE products SET sale_price_cents = round(price_cents * 0.75)
      WHERE slug IN ('harvest-vase', 'ridged-tumblers', 'weathered-stool', 'globe-wall-light')`)
 

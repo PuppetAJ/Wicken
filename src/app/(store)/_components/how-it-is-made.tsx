@@ -6,7 +6,6 @@ import { Text } from '@/components/elements/text'
 import { Rise } from '@/components/motion'
 import { Feature } from '@/components/elements/feature'
 
-/** The three claims the shop makes about itself, next to somebody actually making something. */
 export function HowItIsMade() {
   return (
     <section className="py-10 sm:py-14">

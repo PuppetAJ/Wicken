@@ -11,7 +11,6 @@ import { listTestimonials } from '@/lib/db/queries/reviews'
 
 const card = 'w-[min(20rem,85vw)] sm:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)]'
 
-/** Quotes come from the reviews table, so each one is findable on the product it belongs to. */
 export async function Voices() {
   const quotes = await listTestimonials(6)
   if (quotes.length < 3) return null

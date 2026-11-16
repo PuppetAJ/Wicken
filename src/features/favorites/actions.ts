@@ -10,7 +10,6 @@ const target = z.object({ productId: z.coerce.number().int().positive() })
 type FavoriteState = ActionState<{ favorited?: boolean; needsLogin?: boolean }>
 
 export async function toggle(productId: number): Promise<FavoriteState> {
-  // Not requireUser: a signed-out visitor gets an invitation, not a redirect out of the grid.
   const session = await getSession()
   if (!session) return { needsLogin: true }
 

@@ -4,7 +4,6 @@ export function Stars({ rating, size = 'sm' }: { rating: number; size?: 'sm' | '
   const box = size === 'md' ? 'size-5' : 'size-4'
 
   return (
-    // One label for the group; the stars themselves are decoration.
     <span className="inline-flex items-center gap-0.5" role="img" aria-label={`${rating.toFixed(1)} out of 5`}>
       {[1, 2, 3, 4, 5].map((star) => (
         <StarIcon

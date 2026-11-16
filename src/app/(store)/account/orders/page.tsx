@@ -33,7 +33,6 @@ export default function Page() {
 
 async function Orders() {
   const user = await requireUser()
-  // One query with JSON aggregation, so a page of orders is one round trip, not one per order.
   const orders = await listOrdersForUser(user.id)
 
   if (orders.length === 0) {
@@ -71,7 +70,6 @@ async function Orders() {
               </dl>
             </div>
 
-            {/* Thumbnails, because people recognize what they bought long before they read an order number. */}
             <div className="flex flex-wrap items-center gap-3">
               {order.items.slice(0, 5).map((item) => (
                 <div

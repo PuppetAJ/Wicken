@@ -15,8 +15,6 @@ type TopSeller = {
   revenue_cents: number
 }
 
-/** Paid orders only: an order nobody paid for is not revenue, whatever the dashboard would rather say. */
-// Every column is qualified: products carries a created_at too, and an unqualified one is ambiguous.
 const paidWithin = (o: string) => `${o}.status = 'paid' AND ${o}.created_at >= $1 AND ${o}.created_at < $2`
 
 export async function totalsBetween(from: Date, to: Date): Promise<Totals> {
@@ -40,7 +38,6 @@ export async function totalsBetween(from: Date, to: Date): Promise<Totals> {
   }
 }
 
-/** One row per day including the quiet ones, so the line does not skip a gap and imply trade. */
 export async function revenueByDay(from: Date, to: Date): Promise<DashboardPoint[]> {
   const { rows } = await pool.query<{ day: string; revenue: string; orders: string }>(
     `SELECT to_char(days.day, 'YYYY-MM-DD') AS day,
@@ -74,7 +71,6 @@ export async function topSellers(from: Date, to: Date, limit = 5): Promise<TopSe
 
 type CategorySplit = { category: Category; units: number; revenue_cents: number }
 
-/** What the shop actually sells, by the category a product sits in. Paid orders only. */
 export async function salesByCategory(from: Date, to: Date): Promise<CategorySplit[]> {
   const { rows } = await pool.query<{ category: Category; units: string; revenue_cents: string }>(
     `SELECT p.category, sum(oi.quantity) AS units, sum(oi.quantity * oi.unit_price_cents) AS revenue_cents
@@ -96,5 +92,3 @@ export async function lowStock(threshold = 3, limit = 6): Promise<Product[]> {
   )
   return rows
 }
-
-/** How many rows a list page shows. One number, so every list behaves the same way. */

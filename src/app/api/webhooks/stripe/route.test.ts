@@ -81,7 +81,6 @@ describe('the stripe webhook', { skip: configured ? false : 'Stripe keys are not
 
     const { payload, header } = await signed(completed('cs_test_replay'))
     await receiveStripeEvent(payload, header)
-    // Stripe retries on any non-2xx, and delivers at least once, so this happens in practice.
     const second = await receiveStripeEvent(payload, header)
 
     assert.equal(second.status, 200, 'a replay is still acknowledged')

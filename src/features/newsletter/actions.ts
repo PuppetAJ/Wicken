@@ -9,7 +9,6 @@ import { succeeded, type ActionState } from '@/lib/action-state'
 export type SignupState = ActionState<{ already?: boolean }>
 
 export async function joinNewsletter(_previous: SignupState, formData: FormData): Promise<SignupState> {
-  // Answered as though it worked, because a bot told it failed simply tries again.
   if (isBot(formData)) return succeeded()
 
   const parsed = signup.safeParse({ email: formData.get('email'), source: formData.get('source') })

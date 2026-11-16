@@ -5,7 +5,6 @@ import { SoftButton } from '@/components/elements/button'
 import { signInAsDemo, type AuthState } from '../actions'
 import { FormError } from '@/components/elements/form-error'
 
-// The clicked button's name and value ride along in the FormData, so one form serves two roles.
 export function DemoLogin({ next }: { next: string }) {
   const [state, action, pending] = useActionState<AuthState, FormData>(signInAsDemo, undefined)
 

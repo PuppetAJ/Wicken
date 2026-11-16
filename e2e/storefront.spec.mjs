@@ -1,4 +1,3 @@
-// The shop, the pages that sell, and everything a visitor sees signed out. Needs a seeded database.
 import { BASE, check, freshPage, open, signInAsDemo, test, visibleText, waitForText } from './lib.mjs'
 
 test('Catalog', async ({ page }) => {
@@ -36,7 +35,6 @@ test('The landing page sells something', async ({ browser }) => {
   check('with a way through to the rest', /See the whole collection/.test(text))
   check('somebody is shown making something', (await home.locator('img[src*="editorial-throwing"]').count()) > 0)
 
-  // The band quotes the reviews table, so the quote has to be findable on the product it came from.
   const quote = (await home.locator('blockquote').first().innerText()).replaceAll(/[\u201c\u201d"]/g, '').trim()
   const onward = await home.locator('figcaption a').first().getAttribute('href')
   check('the quotes name the piece they are about', Boolean(onward?.startsWith('/products/')), String(onward))
@@ -79,7 +77,6 @@ test('The help page', async ({ browser }) => {
     check(`the footer's #${id} link lands somewhere`, (await help.locator(`#${id}`).count()) === 1)
   }
 
-  // A discarded message would be worse than printing an address, so it has to survive as far as the admin.
   const said = `A question from the browser suite at ${Date.now()}`
   await help.fill('#name', 'Suite Sender')
   await help.fill('#email', 'sender@wicken.test')
@@ -109,7 +106,6 @@ test('Product page', async ({ page }) => {
   check('dimensions are visible without opening anything', /Dimensions/i.test(text))
   check('related products are offered', (await page.locator('a[href^="/products/"]').count()) > 0)
 
-  // Availability belongs with the price and the rating, not stranded under the button.
   const stockAt = text.search(/In stock, ships|Made to order|Only \d+ left|next batch comes out/)
   check('availability is stated', stockAt > -1, text.slice(Math.max(0, stockAt - 20), stockAt + 40))
   check('and sits above the description', stockAt < text.indexOf('Add to cart'))
@@ -130,7 +126,6 @@ test('Product page', async ({ page }) => {
     !/Made in|In the studio|Electrical|Assembly|Model number|Packaging/.test(specs),
     specs.split('\n').slice(0, 4).join(' | '),
   )
-  // A single piece has nothing to say under Item details, so the heading does not appear.
   check('a heading with nothing under it is dropped', !/Item details/.test(specs))
   const afterAccordion = await page.locator('button[aria-label^="View"]').boundingBox()
   check(
@@ -185,7 +180,6 @@ test('Who made it, and how long it takes', async ({ browser }) => {
     check(`and quotes ${lead}`, said.includes(lead), said.match(/(ships in|Made to order,)[^\n]*/)?.[0])
   }
 
-  // The claim on the landing page has to match what the catalog actually holds.
   await open(reader, '/')
   const band = await visibleText(reader)
   check('the landing page counts the workshops correctly', /three workshops/.test(band))
@@ -195,7 +189,6 @@ test('Who made it, and how long it takes', async ({ browser }) => {
 test('A missing product', async ({ page }) => {
   const response = await page.goto(`${BASE}/products/does-not-exist`, { waitUntil: 'networkidle' })
   const text = await visibleText(page)
-  // The product segment has its own not-found copy; the global one is a different page.
   check('it shows the product not-found page', /do not make that one/i.test(text), text.slice(0, 120))
   check(
     'it is marked noindex',
@@ -222,7 +215,6 @@ test('More from a category', async ({ browser }) => {
 })
 
 test('The shop skeleton mirrors the shop', async () => {
-  // The prerendered shell is read straight from the response rather than racing the browser for it.
   const html = await (await fetch(`${BASE}/shop`)).text()
   const shell = html.split('<script>self.__next_f')[0]
 
@@ -251,7 +243,6 @@ test('The widened catalog', async ({ browser }) => {
     check(`${label} is a category of its own`, found > 0 && found < all, `${found} of ${all}`)
   }
 
-  // Walnut is a material the vocabulary did not have until these pieces existed.
   await shop.goto(`${BASE}/shop?material=walnut`, { waitUntil: 'networkidle' })
   check('walnut filters to the pieces made of it', (await tiles()) > 0, `${await tiles()} in walnut`)
 
@@ -268,7 +259,6 @@ test('Material and color filters', async ({ browser }) => {
   const all = await tiles()
   check('materials are checkboxes', (await shop.locator('input[type="checkbox"][name="material"]').count()) > 5)
   check('colors are swatches', (await shop.locator('input[type="checkbox"][name="color"]').count()) > 5)
-  // Scoped to the material list: the price band labels contain digits quite legitimately.
   const materialList = await shop.locator('fieldset:has(legend:text-is("Material"))').innerText()
   check(
     'no counts beside the materials',
@@ -287,7 +277,6 @@ test('Material and color filters', async ({ browser }) => {
     listed.slice(0, 5).join(', '),
   )
 
-  // A gradient sized to the padding box leaves a bordered circle with pale crescents at the curve.
   const mixed = shop.locator('label[title="Mixed"] span[aria-hidden]')
   if ((await mixed.count()) > 0) {
     check(
@@ -305,7 +294,6 @@ test('Material and color filters', async ({ browser }) => {
 
   await shop.locator('label:has(input[name="material"][value="ash"])').click()
   await shop.waitForURL((url) => url.searchParams.getAll('material').includes('ash'))
-  // Overlap, not intersection: nothing is made of oak *and* ash.
   check('two materials returns either, not both', (await tiles()) > oak, `${await tiles()} tiles`)
 
   await shop.locator('label:has(input[name="material"][value="oak"])').click()
@@ -328,7 +316,6 @@ test('Material and color filters', async ({ browser }) => {
   await shop.goto(`${BASE}/shop?material=bogus&color=nonsense`, { waitUntil: 'networkidle' })
   check('nonsense facets fall back rather than throwing', (await tiles()) === all, `${await tiles()} tiles`)
 
-  // The quick actions overlay the whole tile, so it must not swallow the card's own link.
   await shop.goto(`${BASE}/shop?material=oak`, { waitUntil: 'networkidle' })
   const image = await shop.locator('article').first().locator('img').first().boundingBox()
   await shop.mouse.click(image.x + image.width / 2, image.y + image.height / 2)
@@ -341,7 +328,6 @@ test('Filtering does not reload or flood', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   let requests = 0
   shop.on('request', (request) => {
-    // Prefetches are the router filling its cache, not the typing asking the server for anything.
     if (request.headers()['next-router-prefetch']) return
     if (request.url().includes('/shop') && request.resourceType() !== 'image') requests++
   })
@@ -349,7 +335,6 @@ test('Filtering does not reload or flood', async ({ browser }) => {
   await open(shop, '/shop')
   requests = 0
 
-  // Typing used to re-run its own effect on the render its navigation caused, which is a loop.
   await shop.locator('input[type="search"][name="q"]').click()
   for (const letter of 'teapot') {
     await shop.keyboard.type(letter)
@@ -362,7 +347,6 @@ test('Filtering does not reload or flood', async ({ browser }) => {
   await shop.waitForTimeout(3000)
   check('and stops once idle', requests === afterTyping, `${requests - afterTyping} more while idle`)
 
-  // fill() ignores maxLength, so unclamped 150 characters reach the URL and the schema drops them.
   await shop.locator('input[type="search"][name="q"]').fill('a'.repeat(150))
   await shop.waitForURL((url) => (url.searchParams.get('q') ?? '').length === 100)
   const asked = new URL(shop.url()).searchParams.get('q') ?? ''
@@ -408,7 +392,6 @@ test('Price bands', async ({ browser }) => {
   await shop.goto(`${BASE}/shop?price=bogus`, { waitUntil: 'networkidle' })
   check('a bogus band falls back rather than throwing', (await tiles()) === all)
 
-  // The box we draw ourselves, so its shape and its checked fill are both ours to assert.
   const boxOf = (name, value) => shop.locator(`label:has(input[name="${name}"][value="${value}"]) > span`).first()
   const radiusOf = (box) => box.evaluate((node) => parseFloat(getComputedStyle(node).borderTopLeftRadius))
   const size = await boxOf('price', 'under-50').evaluate((node) => node.getBoundingClientRect().width)
@@ -430,13 +413,11 @@ test('Sale prices', async ({ browser }) => {
 
   await shopper.goto(`${BASE}/products/harvest-vase`, { waitUntil: 'networkidle' })
   const page = await visibleText(shopper)
-  // Seeded at 25% off, so the sale price shows beside the struck-through original.
   check('a sale product shows both prices', /\$58\.50/.test(page) && /\$78\.00/.test(page), page.slice(0, 120))
 
   await shopper.getByRole('button', { name: 'Add to cart' }).click()
   await shopper.locator('[data-slot="sheet-content"]').waitFor()
   const sheet = await shopper.locator('[role="dialog"]').innerText()
-  // The important one: the cart has to charge the sale price, not the list price.
   check(
     'and the cart charges the sale price',
     /58\.50/.test(sheet) && !/78\.00/.test(sheet),
@@ -470,7 +451,6 @@ test('Sorting reviews', async ({ browser }) => {
     await reader.locator('#reviews').scrollIntoViewIfNeeded()
     await reader.waitForTimeout(1200)
   }
-  // Stars put the rating in an aria-label, not in the text, so read it there.
   const ratings = async () =>
     Promise.all(
       (await reader.locator('#reviews li [role="img"]').all()).map(async (star) =>
@@ -496,7 +476,6 @@ test('Sorting reviews', async ({ browser }) => {
   await open('?reviews=highest')
   const high = await ratings()
   check('highest rated runs down the stars', falling(high), high.join(' then '))
-  // Without this the two sorts could be agreeing by chance and neither check would mean much.
   check(
     'and it is not the order most helpful gave',
     high.join() !== helpfulStars.join(),
@@ -541,7 +520,6 @@ test('Long review lists are capped', async ({ browser }) => {
 test('Choosing a review sort does not jump', async ({ browser }) => {
   const { context, page: reader } = await freshPage(browser)
   await reader.goto(`${BASE}/products/spouted-pendant`, { waitUntil: 'networkidle' })
-  // Scrolled to the control first, or the browser's own scroll-into-view on focus is read as the sort's.
   await reader.getByLabel('Sort reviews').scrollIntoViewIfNeeded()
   await reader.waitForTimeout(400)
   const before = await reader.evaluate(() => window.scrollY)

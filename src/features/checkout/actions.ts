@@ -11,7 +11,6 @@ import type { Order } from '@/lib/db/types'
 import type Stripe from 'stripe'
 import { succeeded, type ActionState } from '@/lib/action-state'
 
-// `settled` says whether this call was the one that marked the order paid.
 export type CheckoutState = ActionState<{ settled?: boolean }>
 
 export async function startCheckout(): Promise<CheckoutState> {
@@ -23,7 +22,6 @@ export async function startCheckout(): Promise<CheckoutState> {
 
   let url: string | null = null
   try {
-    // Priced from the products table in one transaction; nothing about the amount comes from the browser.
     const order = await createPendingOrder(user.id, cartId)
 
     const session = await payFor(stripe, order, user.email, `${env.APP_URL}/cart`)
@@ -41,7 +39,6 @@ export async function startCheckout(): Promise<CheckoutState> {
   redirect(url)
 }
 
-/** One place that builds a payment page, so resuming charges exactly what checking out would. */
 async function payFor(
   client: Stripe,
   order: Order,
@@ -51,7 +48,6 @@ async function payFor(
   return client.checkout.sessions.create({
     mode: 'payment',
     customer_email: email,
-    // Stripe is told what to charge; it is never asked.
     line_items: order.items.map((item) => ({
       quantity: item.quantity,
       price_data: {
@@ -65,12 +61,10 @@ async function payFor(
     })),
     success_url: `${env.APP_URL}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: cancelUrl,
-    // The webhook trusts this over anything the browser says it paid for.
     metadata: { orderId: String(order.id) },
   })
 }
 
-/** Picks up an order that was left unpaid, rather than leaving it a dead end in the list. */
 export async function resumePayment(orderId: number): Promise<CheckoutState> {
   const user = await requireUser()
   if (!stripe) return { error: 'Payments are not configured on this deployment.' }
@@ -83,13 +77,11 @@ export async function resumePayment(orderId: number): Promise<CheckoutState> {
   try {
     if (order.stripe_session_id) {
       const old = await stripe.checkout.sessions.retrieve(order.stripe_session_id)
-      // Already paid at Stripe: settle it here rather than wait on the webhook, and never open a second page.
       if (old.payment_status === 'paid') {
         const settled = await markOrderPaid(order.stripe_session_id)
         revalidatePath('/', 'layout')
         return { ...succeeded(), settled }
       }
-      // Expired, so the abandoned tab cannot pay for an order this new session now covers.
       if (old.status === 'open') await stripe.checkout.sessions.expire(order.stripe_session_id)
     }
 

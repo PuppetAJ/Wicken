@@ -1,7 +1,6 @@
 import { pool } from '../src/lib/db/pool.ts'
 import { ensurePeople, reviewerCount } from './demo-people.ts'
 
-// Enough voices that a product page looks lived-in, written to sound like people rather than marketing.
 const lines: [number, string][] = [
   [
     5,
@@ -33,7 +32,6 @@ const lines: [number, string][] = [
   [5, 'Two years in and the only mark on it is one I put there myself. It has aged exactly as they said it would.'],
 ]
 
-/** Called by scripts/seed.ts, so one command produces the whole demo dataset. */
 export async function seedDemoReviews(): Promise<number> {
   const client = await pool.connect()
   try {
@@ -46,7 +44,6 @@ export async function seedDemoReviews(): Promise<number> {
 
     let written = 0
     for (const [index, product] of products.entries()) {
-      // A deterministic spread: some products carry four reviews and some none, so the empty state is seen.
       const howMany = [3, 0, 7, 4, 1, 0, 2, 1][index % 8]
       for (let n = 0; n < howMany; n++) {
         const [rating, body] = lines[(index * 3 + n) % lines.length]
@@ -60,7 +57,6 @@ export async function seedDemoReviews(): Promise<number> {
       }
     }
 
-    // Votes so "most helpful" has something to order by, deterministic so a reseed keeps the ranking.
     await client.query('DELETE FROM review_votes WHERE voter_id = ANY($1)', [ids])
     const { rows: seeded } = await client.query<{ user_id: string; product_id: number }>(
       'SELECT user_id, product_id FROM reviews WHERE user_id = ANY($1) ORDER BY product_id, user_id',
