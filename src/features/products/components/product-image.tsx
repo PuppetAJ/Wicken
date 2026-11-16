@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { useRef, useState, type MouseEvent } from 'react'
 
 const magnification = 2.2
+const magnifiedSizes = '(min-width: 1024px) 1600px, 100vw'
 
 export function ProductImage({ src, alt, objectPosition }: { src: string; alt: string; objectPosition: string }) {
   const frame = useRef<HTMLButtonElement>(null)
@@ -32,7 +33,7 @@ export function ProductImage({ src, alt, objectPosition }: { src: string; alt: s
           src={src}
           alt={alt}
           fill
-          sizes="(min-width: 1024px) 1600px, 100vw"
+          sizes={magnifiedSizes}
           priority
           style={{
             objectPosition,
