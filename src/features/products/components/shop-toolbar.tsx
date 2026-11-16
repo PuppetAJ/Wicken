@@ -19,7 +19,6 @@ export function ShopToolbar({
 
   return (
     <div className="flex flex-col gap-6">
-      {/* Hidden where the filter sheet carries the same categories; revealed again without JavaScript. */}
       <div data-inline-filters="chips" className="hidden flex-wrap items-center gap-x-2 gap-y-3 lg:flex">
         <CategoryLink href={shopHref({ ...search, category: undefined })} active={!search.category}>
           Everything
@@ -50,7 +49,6 @@ export function ShopToolbar({
       <div className="flex items-center gap-3 text-sm text-olive-600 dark:text-olive-400">
         <p>
           {count} {count === 1 ? 'piece' : 'pieces'}
-          {/* Named here because the chips that would have shown it are behind a button on a phone. */}
           {search.category && ` in ${categoryLabels[search.category].toLowerCase()}`}
         </p>
         {filtered && (

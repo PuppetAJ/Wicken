@@ -1,7 +1,6 @@
 import type { Funnel as Steps } from '@/lib/db/queries/events'
 import { formatCount } from '@/lib/format'
 
-/** Bars share one scale and one hue: a magnitude down an ordered path, not five categories. */
 export function Funnel({ steps }: { steps: Steps }) {
   const rows = [
     ['Visited', steps.sessions],
@@ -16,7 +15,6 @@ export function Funnel({ steps }: { steps: Steps }) {
     <ol className="flex flex-col gap-3">
       {rows.map(([label, count], step) => {
         const share = (count / widest) * 100
-        // Of the step above, which is the number that says where people are actually lost.
         const kept = step === 0 ? null : (count / Math.max(rows[step - 1][1], 1)) * 100
 
         return (

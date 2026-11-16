@@ -22,7 +22,6 @@ export function AnnouncementBadge({
       {...props}
       data-variant={variant}
       className={clsx(
-        // One pill at every width; the quote truncates when squeezed and drops out below sm.
         'group relative inline-flex max-w-full items-center gap-x-3 overflow-hidden rounded-full px-3 py-0.5 text-sm/6',
         variant === 'normal' &&
           'bg-olive-950/5 text-olive-950 hover:bg-olive-950/10 dark:bg-white/5 dark:text-white dark:inset-ring-1 dark:inset-ring-white/5 dark:hover:bg-white/10',

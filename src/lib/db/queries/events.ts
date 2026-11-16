@@ -19,22 +19,18 @@ export async function recordEvent(event: {
 }
 
 type Visitors = {
-  /** Accounts that looked at anything in the window. */
-  known: number
-  /** Of those, the ones that had also looked before it. */
+  signedIn: number
   returning: number
-  /** Of those, the ones that bought. */
   bought: number
 }
 
-/** Only signed-in accounts appear: there is nothing to join anybody else on, so they stay sessions. */
 export async function visitorsBetween(from: Date, to: Date): Promise<Visitors> {
-  const { rows } = await pool.query<{ known: string; returning: string; bought: string }>(
+  const { rows } = await pool.query<{ signed_in: string; returning: string; bought: string }>(
     `WITH seen AS (
        SELECT DISTINCT user_id FROM events
         WHERE user_id IS NOT NULL AND created_at >= $1 AND created_at < $2
      )
-     SELECT (SELECT count(*) FROM seen) AS known,
+     SELECT (SELECT count(*) FROM seen) AS signed_in,
             (SELECT count(*) FROM seen s
               WHERE EXISTS (SELECT 1 FROM events e
                              WHERE e.user_id = s.user_id AND e.created_at < $1)) AS returning,
@@ -45,7 +41,7 @@ export async function visitorsBetween(from: Date, to: Date): Promise<Visitors> {
     [from, to],
   )
   const row = rows[0]
-  return { known: Number(row.known), returning: Number(row.returning), bought: Number(row.bought) }
+  return { signedIn: Number(row.signed_in), returning: Number(row.returning), bought: Number(row.bought) }
 }
 
 export type Funnel = {
@@ -56,7 +52,6 @@ export type Funnel = {
   purchases: number
 }
 
-/** Distinct sessions, not raw events: six product pages is still one person deciding. */
 export async function funnelBetween(from: Date, to: Date): Promise<Funnel> {
   const { rows } = await pool.query<Record<keyof Funnel, string>>(
     `SELECT count(DISTINCT session) FILTER (WHERE name = 'view') AS sessions,

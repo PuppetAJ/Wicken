@@ -10,7 +10,6 @@ import { succeeded, type ActionState } from '@/lib/action-state'
 export type ReviewState = ActionState<{ needsLogin?: boolean }>
 
 export async function submitReview(_previous: ReviewState, formData: FormData): Promise<ReviewState> {
-  // Not requireUser: being bounced out of the page you were reading is worse than being asked.
   const session = await getSession()
   if (!session) return { needsLogin: true }
 
@@ -24,7 +23,6 @@ export async function submitReview(_previous: ReviewState, formData: FormData): 
   if (!(await limitAttempts('review', 10))) return { error: throttled }
 
   await saveReview(session.user.id, parsed.data.productId, parsed.data.rating, parsed.data.body)
-  // The product page is cached, and its reviews are not part of that cache key.
   revalidatePath(`/products/${formData.get('slug')}`)
   return succeeded()
 }
@@ -42,7 +40,6 @@ export async function voteOnHelpfulness(
   const parsed = reviewVote.safeParse({ productId, reviewUserId, helpful })
   if (!parsed.success) return { error: 'That vote could not be counted.' }
 
-  // The database rejects a vote on your own review, so this is the friendly message for it.
   if (parsed.data.reviewUserId === session.user.id) return { error: 'You cannot vote on your own review.' }
 
   await voteOnReview(session.user.id, parsed.data.reviewUserId, parsed.data.productId, parsed.data.helpful)

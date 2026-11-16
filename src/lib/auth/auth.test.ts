@@ -5,7 +5,6 @@ import { pool } from '../db/pool.ts'
 import { resetDatabase } from '../db/test-support.ts'
 import { authOptions } from './options.ts'
 
-// ./index.ts pulls next/headers, which will not resolve here, so the instance is built from the options.
 const auth = betterAuth(authOptions)
 
 after(() => pool.end())
@@ -41,7 +40,6 @@ describe('authentication', () => {
   })
 
   it('never lets the sign-up body choose its own role', async () => {
-    // Without input: false on the field, a crafted sign-up POST would hand the caller the admin dashboard.
     await auth.api.signUpEmail({ body: { ...shopper, role: 'admin' } as never })
 
     const { rows } = await pool.query<{ role: string }>('SELECT role FROM users')
@@ -51,7 +49,6 @@ describe('authentication', () => {
   it('issues a cookie that resolves back to the user', async () => {
     await auth.api.signUpEmail({ body: shopper })
 
-    // asResponse, because the cookie is the thing the browser and the proxy see.
     const response = await auth.api.signInEmail({
       body: { email: shopper.email, password: shopper.password },
       asResponse: true,
@@ -67,7 +64,6 @@ describe('authentication', () => {
   })
 
   it('takes a user and account in the shape the Google callback writes', async () => {
-    // The social callback does not go through auth.api, so this repeats the two writes it makes.
     const { internalAdapter } = await auth.$context
     const user = await internalAdapter.createUser(
       {

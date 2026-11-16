@@ -10,7 +10,6 @@ export type Review = {
   created_at: Date
   helpful: number
   unhelpful: number
-  /** True for up, false for down, null where the reader has not voted or is signed out. */
   own_vote: boolean | null
 }
 
@@ -19,7 +18,6 @@ type ReviewSummary = { count: number; average: number }
 const net = 'count(*) FILTER (WHERE v.helpful) - count(*) FILTER (WHERE NOT v.helpful)'
 
 const reviewOrder: Record<ReviewSort, string> = {
-  // Net score, so a review nobody found helpful does not outrank one people disagreed about.
   helpful: `${net} DESC, r.created_at DESC`,
   recent: 'r.created_at DESC',
   highest: 'r.rating DESC, r.created_at DESC',
@@ -32,7 +30,6 @@ export async function listReviews(
   productId: number,
   { sort = 'helpful', viewerId }: { sort?: ReviewSort; viewerId?: string } = {},
 ): Promise<Review[]> {
-  // Two joins: one to count everybody's votes, one to find this reader's own.
   const { rows } = await pool.query<Row>(
     `SELECT r.user_id, u.name AS author, r.rating, r.body, r.created_at,
             count(*) FILTER (WHERE v.helpful) AS helpful,
@@ -59,7 +56,6 @@ export async function summarizeReviews(productId: number): Promise<ReviewSummary
   return { count: Number(rows[0].count), average: Number(rows[0].average ?? 0) }
 }
 
-/** Upsert, so a second submission edits rather than being refused or duplicated. */
 export async function saveReview(userId: string, productId: number, rating: number, body: string): Promise<void> {
   await pool.query(
     `INSERT INTO reviews (user_id, product_id, rating, body) VALUES ($1, $2, $3, $4)
@@ -79,7 +75,6 @@ export async function getOwnReview(
   return rows[0] ?? null
 }
 
-/** Null clears the vote, so pressing the same thumb twice undoes it. */
 export async function voteOnReview(
   voterId: string,
   reviewUserId: string,
@@ -102,7 +97,6 @@ export async function voteOnReview(
   )
 }
 
-/** Ratings for a whole grid in one query, rather than one per tile. */
 export async function summarizeMany(productIds: number[]): Promise<Map<number, ReviewSummary>> {
   if (productIds.length === 0) return new Map()
 
@@ -124,7 +118,6 @@ type Testimonial = {
 }
 
 export async function listTestimonials(limit = 3): Promise<Testimonial[]> {
-  // Distinct on the body: the demo reviewers share a pool of sentences, so the band would repeat one.
   const { rows } = await pool.query<Testimonial>(
     `SELECT * FROM (
        SELECT DISTINCT ON (r.body) u.name AS author, r.body, r.rating,

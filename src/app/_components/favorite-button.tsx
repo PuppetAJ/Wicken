@@ -4,7 +4,6 @@ import { HeartIcon } from 'lucide-react'
 import { Pop } from '@/components/motion'
 import { useFavorite } from '@/features/favorites/use-favorite'
 
-/** The product page's own save control, beside Add to cart rather than over a tile. */
 export function FavoriteButton({
   productId,
   name,

@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { Button } from '@/components/elements/button'
 import { resumePayment, type CheckoutState } from '../actions'
 
-/** An order left unpaid is otherwise a dead end: the cart it came from is already gone. */
 export function ResumePayment({ orderId, size = 'md' }: { orderId: number; size?: 'md' | 'lg' }) {
   const [state, action, pending] = useActionState<CheckoutState, FormData>(() => resumePayment(orderId), undefined)
   const router = useRouter()
@@ -14,7 +13,7 @@ export function ResumePayment({ orderId, size = 'md' }: { orderId: number; size?
   useEffect(() => {
     if (state?.error) toast.error(state.error)
     if (!state?.ok) return
-    if (state.settled) toast.success('Payment confirmed', { description: 'This order is now marked as paid.' })
+    if (state.markedPaid) toast.success('Payment confirmed', { description: 'This order is now marked as paid.' })
     else toast('Payment received', { description: 'Please allow a moment for it to show on this order.' })
     router.refresh()
   }, [state, router])

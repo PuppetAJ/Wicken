@@ -39,7 +39,6 @@ function Checkmark() {
   )
 }
 
-/** Round for price, square elsewhere, but a tick either way so the round one is not read as a radio. */
 function Check({
   name,
   value,
@@ -85,11 +84,9 @@ function Group({ label, children }: { label: string; children: ReactNode }) {
   )
 }
 
-/** Real checkboxes in a GET form, with the submit replayed through the router so scroll is not lost. */
 export function FacetFilters({
   search,
   facets,
-  // The rail sits beside the category chips; the sheet replaces them, so it carries them itself.
   withCategories = false,
 }: {
   search: ShopSearch
@@ -122,7 +119,6 @@ export function FacetFilters({
 
   return (
     <form ref={form} action="/shop" onSubmit={apply} className="flex flex-col gap-8">
-      {/* Carried so filtering does not silently drop the category, sort or search. */}
       {search.category && !withCategories && <input type="hidden" name="category" value={search.category} />}
       {search.sort !== 'newest' && <input type="hidden" name="sort" value={search.sort} />}
       {search.q && <input type="hidden" name="q" value={search.q} />}
@@ -177,7 +173,6 @@ export function FacetFilters({
       </Group>
 
       <Group label="Color">
-        {/* Swatches alone: the name is the accessible label, not a column of text. */}
         <div className="flex flex-wrap gap-2">
           {facets.colors.map((value) => {
             const color = value as Color
@@ -221,7 +216,6 @@ export function FacetFilters({
   )
 }
 
-/** A radio wearing the same pill the wide toolbar uses for the category it links to. */
 function Chip({ name, label, checked, onPick }: { name: string; label: string; checked: boolean; onPick: () => void }) {
   return (
     <label className="cursor-pointer">

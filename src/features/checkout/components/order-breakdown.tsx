@@ -2,7 +2,6 @@ import type { Category } from '@/lib/db/types'
 import { formatMonthAndDay, formatPrice } from '@/lib/format'
 import { leadTimeFor, slowestLeadTime } from '@/lib/lead-times'
 
-/** Counts business days for the quick things and plain weeks for what is made to order. */
 function arrivalWindow(categories: Category[], from = new Date()) {
   const lead = categories.length ? slowestLeadTime(categories) : leadTimeFor('tableware')
   const add = (count: number) => {

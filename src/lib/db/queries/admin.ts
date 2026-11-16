@@ -29,7 +29,6 @@ type ProductEdit = {
   is_featured: boolean
 }
 
-/** Returns the saved row, so a caller never has to guess what the database settled on. */
 export async function updateProduct(id: number, edit: ProductEdit): Promise<Product | null> {
   const { rows } = await pool.query<Product>(
     `UPDATE products
@@ -41,7 +40,6 @@ export async function updateProduct(id: number, edit: ProductEdit): Promise<Prod
   return rows[0] ?? null
 }
 
-// A function, not a constant: count(*) OVER () lands after GROUP BY, so it counts orders, not items.
 const orderWithItems = (extra = '') => `
   SELECT o.*, u.name AS customer_name, u.email AS customer_email${extra}, ${orderItemsJson}
   FROM orders o
@@ -55,7 +53,6 @@ export const orderSorts = ['order', 'placed', 'status', 'items', 'total'] as con
 export type OrderSort = (typeof orderSorts)[number]
 export type SortDirection = 'asc' | 'desc'
 
-/** The direction a column starts in when it is first clicked: newest, biggest, or A to Z. */
 export const orderSortDefaults: Record<OrderSort, SortDirection> = {
   order: 'desc',
   placed: 'desc',
@@ -64,7 +61,6 @@ export const orderSortDefaults: Record<OrderSort, SortDirection> = {
   total: 'desc',
 }
 
-// Only these fragments ever reach ORDER BY; the sort key is looked up here, never interpolated.
 const orderSortColumns: Record<OrderSort, string> = {
   order: 'o.id',
   placed: 'o.created_at',
@@ -102,7 +98,6 @@ export async function getAdminOrder(id: number): Promise<AdminOrder | null> {
   return rows[0] ?? null
 }
 
-/** paid_at follows the status, so the two can never disagree about whether money arrived. */
 export async function setOrderStatus(id: number, status: OrderStatus): Promise<AdminOrder | null> {
   await pool.query(
     `UPDATE orders SET status = $2, paid_at = CASE WHEN $2 = 'paid' THEN COALESCE(paid_at, now()) ELSE NULL END

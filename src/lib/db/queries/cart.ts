@@ -13,7 +13,6 @@ export async function createCartForUser(userId: string): Promise<string> {
   return rows[0].id
 }
 
-/** True only for a cart nobody owns, which is what may still be claimed on login. */
 export async function isGuestCart(cartId: string): Promise<boolean> {
   const { rows } = await pool.query('SELECT 1 FROM carts WHERE id = $1 AND user_id IS NULL', [cartId])
   return rows.length > 0
@@ -45,7 +44,6 @@ export async function getCartItems(cartId: string): Promise<CartItem[]> {
   return rows
 }
 
-/** Adds to the existing quantity, never above what is in stock. */
 export async function addCartItem(cartId: string, productId: number, quantity: number): Promise<void> {
   await pool.query(
     `INSERT INTO cart_items (cart_id, product_id, quantity)
@@ -85,7 +83,6 @@ export async function getCartIdForUser(userId: string): Promise<string | null> {
   return rows[0]?.id ?? null
 }
 
-/** Claims a guest cart on login, folding it into any cart the user already had. */
 export async function mergeGuestCart(guestCartId: string, userId: string): Promise<string> {
   const client = await pool.connect()
   try {

@@ -25,7 +25,6 @@ export function AdminNav() {
       className="flex min-w-0 gap-1 lg:flex-col lg:overflow-visible lg:[mask-image:none]"
     >
       {links.map(({ href, label, icon: Icon }) => {
-        // Overview would otherwise light up on every page beneath it.
         const active = href === '/admin' ? path === href : path.startsWith(href)
         return (
           <Link

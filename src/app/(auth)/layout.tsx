@@ -17,7 +17,6 @@ export default function AuthLayout({ children }: LayoutProps<'/'>) {
           <div className="w-full max-w-sm">{children}</div>
         </div>
       </div>
-      {/* At L*57 it reads as a lit block against the dark theme rather than receding, hence the dimming. */}
       <div className="relative hidden bg-tile lg:block">
         <Image
           src="/images/editorial-bench.jpg"

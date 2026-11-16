@@ -1,7 +1,5 @@
 name: CI
 
-# A pull request run covers a branch; the push trigger is for main only, so a
-# branch push does not run twice.
 on:
   push:
     branches: [main]
@@ -15,7 +13,6 @@ jobs:
   check:
     runs-on: ubuntu-latest
 
-    # The query tests run against a real Postgres rather than a mock.
     services:
       postgres:
         image: postgres:18
@@ -34,7 +31,6 @@ jobs:
     env:
       DATABASE_URL: postgresql://wicken:wicken@127.0.0.1:5432/wicken
       TEST_DATABASE_URL: postgresql://wicken:wicken@127.0.0.1:5432/wicken_test
-      # Throwaway: nothing in CI signs a cookie that has to be read back later.
       BETTER_AUTH_SECRET: ci-secret-not-used-for-anything-real
 
     steps:
@@ -47,8 +43,6 @@ jobs:
           node-version-file: .node-version
           cache: pnpm
 
-      # Fails if the lockfile disagrees with package.json, which catches a
-      # dependency added locally but never committed.
       - run: pnpm install --frozen-lockfile
 
       - run: pnpm lint

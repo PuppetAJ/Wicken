@@ -28,7 +28,6 @@ export default async function Page() {
   }
 
   const total = cartSubtotal(items)
-  // The order ships together, so the slowest thing in it is the honest answer.
   const lead = slowestLeadTime(items.map((item) => item.category))
 
   return (

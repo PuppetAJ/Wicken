@@ -5,7 +5,6 @@ import { control } from '@/components/elements/control'
 import { useDebouncedQuery } from '@/components/use-debounced-query'
 import { searchMaxLength, shopHref, type ShopSearch } from '../schemas'
 
-/** Filters as you type against a trigram index, and stays a real GET form without JavaScript. */
 export function SearchBox({ search }: { search: ShopSearch }) {
   const withoutQuery = shopHref({ ...search, q: undefined })
   const { value, setValue, pending } = useDebouncedQuery({
@@ -41,7 +40,6 @@ export function SearchBox({ search }: { search: ShopSearch }) {
       <span aria-live="polite" className="sr-only">
         {pending ? 'Searching' : ''}
       </span>
-      {/* Only reachable without JavaScript; typing already navigates otherwise. */}
       <noscript>
         <button
           type="submit"

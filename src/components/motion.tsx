@@ -4,24 +4,19 @@ import { domAnimation, LazyMotion, m, type Variants } from 'motion/react'
 import { Children, useCallback, useRef, type ReactNode } from 'react'
 
 const step = 0.06
-// Past this the delay stops growing, or the last tile of a tall screenful arrives a second late.
 const most = 9
-// A pause longer than this is a new arrival rather than the same one, so the count starts over.
 const apart = 120
 
 const rise: Variants = {
   hidden: { opacity: 0, y: 24, scale: 0.97 },
-  // `take` is called here so the queue place is claimed when the tile starts, not when it rendered.
   shown: (take: () => number) => ({
     opacity: 1,
     y: 0,
     scale: 1,
-    // A spring rather than an ease: the small overshoot reads as arriving rather than fading.
     transition: { delay: take() * step, type: 'spring', stiffness: 260, damping: 22 },
   }),
 }
 
-/** Wraps server-rendered children so only the wrapper ships; the delay counts arrivals, not positions. */
 export function Stagger({ children, className }: { children: ReactNode; className?: string }) {
   const queue = useRef({ at: 0, next: 0, given: new Map<number, number>() })
 
@@ -55,7 +50,6 @@ export function Stagger({ children, className }: { children: ReactNode; classNam
           </m.div>
         ))}
       </div>
-      {/* Motion's hidden state is in the server markup, so without JavaScript nothing is ever revealed. */}
       <noscript>
         <style>{'[data-stagger]{opacity:1!important;transform:none!important}'}</style>
       </noscript>
@@ -63,7 +57,6 @@ export function Stagger({ children, className }: { children: ReactNode; classNam
   )
 }
 
-/** Plays on mount, for what is already on screen: `Rise` would wait to be scrolled to. */
 export function Enter({
   children,
   className,
@@ -73,7 +66,6 @@ export function Enter({
   children: ReactNode
   className?: string
   delay?: number
-  /** A span where the parent only accepts phrasing content, such as inside a heading. */
   as?: 'div' | 'span'
 }) {
   const Tag = as === 'span' ? m.span : m.div
@@ -96,7 +88,6 @@ export function Enter({
   )
 }
 
-/** One thing rising into place, for a heading or a panel rather than a list. */
 export function Rise({ children, className, delay = 0 }: { children: ReactNode; className?: string; delay?: number }) {
   return (
     <LazyMotion features={domAnimation} strict>
@@ -117,14 +108,12 @@ export function Rise({ children, className, delay = 0 }: { children: ReactNode; 
   )
 }
 
-/** A spring, which CSS transitions cannot do; no movement at all when motion is not wanted. */
 export function Pop({ on, children, className }: { on: boolean; children: ReactNode; className?: string }) {
   return (
     <LazyMotion features={domAnimation} strict>
       <m.span
         className={className}
         data-pop
-        // Keyed on the state, so the spring replays each time it flips rather than only on mount.
         key={String(on)}
         initial={{ scale: 0.55 }}
         animate={{ scale: 1 }}

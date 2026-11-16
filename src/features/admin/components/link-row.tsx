@@ -4,7 +4,6 @@ import type { MouseEvent, ReactNode } from 'react'
 import { useRouter } from 'next/navigation'
 import { Row } from './table-row'
 
-// The whole row opens the record; the real link inside still serves the keyboard, new tabs and readers.
 export function LinkRow({ href, children }: { href: string; children: ReactNode }) {
   const router = useRouter()
 

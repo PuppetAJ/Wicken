@@ -10,11 +10,9 @@ import { navLinks } from '@/lib/nav'
 
 export function MobileNav({ account }: { account?: ReactNode }) {
   const pathname = usePathname()
-  // Remembers where it was opened, so any navigation closes it without a click handler on every link.
   const [openedAt, setOpenedAt] = useState<string | null>(null)
   const open = openedAt === pathname
 
-  // The button that opens it disappears at lg, so crossing that width closes the sheet too.
   useEffect(() => {
     const wide = window.matchMedia('(min-width: 1024px)')
     const close = (event: MediaQueryListEvent) => {

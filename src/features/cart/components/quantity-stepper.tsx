@@ -12,7 +12,6 @@ export function QuantityStepper({
 }: {
   quantity: number
   max: number
-  /** 0 where stepping past the last one should remove the line rather than stop at it. */
   min?: number
   onChange: (quantity: number) => void
   disabled?: boolean
@@ -21,7 +20,6 @@ export function QuantityStepper({
   const step =
     'inline-flex size-8 items-center justify-center rounded-full text-olive-700 hover:bg-olive-950/10 disabled:opacity-40 disabled:hover:bg-transparent dark:text-olive-400 dark:hover:bg-white/10'
 
-  // The next press empties the line, so say so rather than leaving an unchanged-looking minus.
   const removes = min === 0 && quantity === 1
 
   return (

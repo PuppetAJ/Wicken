@@ -27,7 +27,6 @@ export function ReviewForm({
     if (state?.error) toast.error(state.error)
   }, [state])
 
-  // Asked before the writing, so nobody composes a review they turn out not to be allowed to post.
   if (!signedIn || state?.needsLogin) {
     return (
       <p className="text-sm text-olive-600 dark:text-olive-400">

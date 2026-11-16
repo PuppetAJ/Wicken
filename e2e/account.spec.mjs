@@ -1,4 +1,3 @@
-// Throttling runs last because it spends the sign-in budget. Needs a seeded database.
 import {
   BASE,
   check,
@@ -93,7 +92,6 @@ test('Finding your way back', async ({ browser }) => {
     nav.url(),
   )
 
-  // Landing on a product directly has no filters to go back to.
   await nav.goto(`${BASE}/products/ash-dining-table`, { waitUntil: 'networkidle' })
   check('arriving cold says Shop instead', /Shop/.test(await nav.locator('nav[aria-label="Breadcrumb"]').innerText()))
 
@@ -117,7 +115,6 @@ test('Quick actions on the grid', async ({ browser }) => {
   const card = shop.locator('article').first()
   const name = await card.locator('h3').innerText()
 
-  // A touch device never fires hover, so the buttons must be clickable without it.
   const add = card.locator('button[aria-label^="Add"]')
   check('every tile carries a quick add', (await add.count()) === 1)
   check(
@@ -129,7 +126,6 @@ test('Quick actions on the grid', async ({ browser }) => {
   await waitForText(shop, /added to your cart/i)
   check('quick add puts it in the cart', (await badge().innerText()) === '1', name)
 
-  // Signed out, favouriting should invite a login rather than fail silently.
   await card.locator('button[aria-label^="Save"]').click()
   await waitForText(shop, /Log in to save/i)
   check('favouriting signed out asks for a login', /Log in to save/.test(await visibleText(shop)))
@@ -151,7 +147,6 @@ test('Favorites, signed in', async ({ browser }) => {
   const after = shop.locator('article').first()
   check('and it survives a reload', (await after.locator('button[aria-pressed="true"]').count()) === 1)
 
-  // Leave the demo account as it was found.
   await after.locator('button[aria-label^="Remove"]').click()
   await shop.waitForTimeout(1500)
   check('unfavouriting undoes it', (await after.locator('button[aria-pressed="false"]').count()) === 1)
@@ -170,7 +165,6 @@ test('Favoriting from the product page', async ({ browser }) => {
   await reader.waitForTimeout(1800)
   check('and it toggles', (await save.getAttribute('aria-pressed')) !== before)
 
-  // Leave the demo account as it was found.
   await save.click()
   await reader.waitForTimeout(1500)
   check('toggling back leaves it as found', (await save.getAttribute('aria-pressed')) === before)
@@ -190,7 +184,6 @@ test('The account area', async ({ browser }) => {
     sidebar.replace(/\n/g, ' | '),
   )
 
-  // Save something, then confirm it is listed there.
   await account.goto(`${BASE}/shop?category=lighting`, { waitUntil: 'networkidle' })
   const card = account.locator('article').first()
   const name = await card.locator('h3').innerText()
@@ -200,7 +193,6 @@ test('The account area', async ({ browser }) => {
   await open(account, `/account/favorites`)
   check('a saved product is listed there', (await visibleText(account)).includes(name), name)
 
-  // Leave the demo account as it was found.
   await account.locator('button[aria-label^="Remove"]').first().click()
   await account.waitForTimeout(1500)
   await context.close()
@@ -255,7 +247,6 @@ test('Writing a review', async ({ browser }) => {
   check('the review appears', (await author.locator('#reviews').innerText()).includes(words))
   check('and the form offers to update it', /Update your review/.test(await author.locator('#reviews').innerText()))
 
-  // A second submission edits rather than duplicating, because of the primary key.
   const revised = `Edited, run ${Date.now()}`
   await author.fill('textarea[name="body"]', revised)
   await author.getByRole('button', { name: 'Update your review' }).click()
@@ -295,12 +286,10 @@ test('Helpful votes on reviews', async ({ browser }) => {
   await open()
   check('the vote survives a reload', Number(await thumbs.first().innerText()) === after)
 
-  // The same thumb again clears it, rather than counting twice.
   await thumbs.first().click()
   await reader.waitForTimeout(1800)
   check('pressing it again takes it back', Number(await thumbs.first().innerText()) === before)
 
-  // A review of your own is not something to vote on, and the table refuses it too.
   await open('?reviews=recent')
   const panel = await reader.locator('#reviews').innerText()
   check('your own review is not votable', /Your review ·/.test(panel), panel.split('\n').slice(0, 3).join(' | '))

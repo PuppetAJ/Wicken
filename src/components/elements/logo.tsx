@@ -1,4 +1,3 @@
-/** A rowan, which is what a wicken tree is. Decorative only: every use says "Wicken" in text beside it. */
 export function Logo({ className = 'size-6' }: { className?: string }) {
   return (
     <svg

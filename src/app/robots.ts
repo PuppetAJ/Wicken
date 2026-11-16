@@ -6,7 +6,6 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: '*',
       allow: '/',
-      // Nothing here is secret, but none of it is worth indexing either.
       disallow: ['/admin', '/account', '/cart', '/checkout', '/api'],
     },
     sitemap: `${env.APP_URL}/sitemap.xml`,

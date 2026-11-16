@@ -3,7 +3,6 @@ import { ButtonLink } from './button'
 import { Heading } from './heading'
 import { Text } from './text'
 
-/** A dead end always offers the same way out, so the copy is the only thing that changes. */
 export function EmptyState({ heading, children }: { heading?: ReactNode; children: ReactNode }) {
   return (
     <div className="flex flex-col items-start gap-6">

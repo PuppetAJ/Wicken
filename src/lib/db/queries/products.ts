@@ -1,6 +1,6 @@
 import 'server-only'
 import { pool } from '../pool.ts'
-import type { Category, Product } from '../types.ts'
+import type { Category, PriceRange, Product } from '../types.ts'
 import { searchTerm } from '../text.ts'
 
 export type ProductSort = 'newest' | 'price-asc' | 'price-desc' | 'name'
@@ -24,18 +24,15 @@ export async function listProducts({
   search?: string
   materials?: string[]
   colors?: string[]
-  /** Inclusive lower bound, exclusive upper; null upper means open-ended. */
-  priceRanges?: [number, number | null][]
+  priceRanges?: PriceRange[]
   sort?: ProductSort
 } = {}): Promise<Product[]> {
-  // A null means "no filter" so the SQL stays one statement; `&&` is overlap, so oak and ash means either.
   const { rows } = await pool.query<Product>(
     `SELECT * FROM products
      WHERE ($1::text IS NULL OR category = $1)
        AND ($2::text IS NULL OR name ILIKE '%' || $2 || '%' OR description ILIKE '%' || $2 || '%')
        AND ($3::text[] IS NULL OR material_tags && $3)
        AND ($4::text[] IS NULL OR color = ANY($4))
-       -- Any chosen band matching is enough, so the bands read as "or" like every other facet.
        AND ($5::int[] IS NULL OR EXISTS (
          SELECT 1 FROM unnest($5::int[], $6::int[]) AS band(lo, hi)
          WHERE COALESCE(sale_price_cents, price_cents) >= band.lo
@@ -47,14 +44,13 @@ export async function listProducts({
       search ? searchTerm(search) : null,
       materials?.length ? materials : null,
       colors?.length ? colors : null,
-      priceRanges?.length ? priceRanges.map(([lo]) => lo) : null,
-      priceRanges?.length ? priceRanges.map(([, hi]) => hi) : null,
+      priceRanges?.length ? priceRanges.map((range) => range.fromCents) : null,
+      priceRanges?.length ? priceRanges.map((range) => range.belowCents) : null,
     ],
   )
   return rows
 }
 
-/** Read from the catalog rather than the vocabulary, so a facet nothing carries is never shown. */
 export async function listFacets(): Promise<{ materials: string[]; colors: string[] }> {
   const [materials, colors] = await Promise.all([
     pool.query<{ value: string }>('SELECT unnest(material_tags) AS value FROM products GROUP BY value ORDER BY value'),
@@ -94,7 +90,6 @@ export async function listRelatedProducts(product: Product, limit = 4): Promise<
 type CategoryCover = { category: Category; slug: string; count: number; image_url: string | null }
 
 export async function listCategoryCovers(): Promise<CategoryCover[]> {
-  // The ORDER BY makes DISTINCT ON take the dearest piece in stock for each category.
   const { rows } = await pool.query<CategoryCover & { count: string }>(
     `SELECT DISTINCT ON (category) category, slug, image_url,
             count(*) OVER (PARTITION BY category) AS count

@@ -28,7 +28,6 @@ export function CartLines({ items }: { items: CartItem[] }) {
       apply({ productId, quantity })
       const result = quantity <= 0 ? await removeFromCart(productId) : await setQuantity(productId, quantity)
       if (result?.error) toast.error(result.error)
-      // Refreshes this route only, rather than invalidating every cached path.
       router.refresh()
     })
   }

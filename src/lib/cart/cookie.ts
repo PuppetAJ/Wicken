@@ -8,7 +8,6 @@ export async function readCartCookie(): Promise<string | undefined> {
   return (await cookies()).get(CART_COOKIE)?.value
 }
 
-// httpOnly so script cannot read it: holding the id is holding the cart.
 export async function writeCartCookie(cartId: string): Promise<void> {
   ;(await cookies()).set(CART_COOKIE, cartId, {
     httpOnly: true,

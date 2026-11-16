@@ -1,10 +1,8 @@
-// The cart, the guest cart being claimed, and checkout. Needs a seeded database.
 import { BASE, check, freshPage, open, signInAsDemo, test, visibleText } from './lib.mjs'
 
 test('Cart', async ({ browser }) => {
   const { context, page: shop } = await freshPage(browser)
   const badge = () => shop.locator('[data-cart-badge]')
-  // The badge is a server component that re-renders after the action, so it lands after the sheet opens.
   const badgeReaches = (count) =>
     shop
       .waitForFunction(
@@ -44,7 +42,6 @@ test('Cart', async ({ browser }) => {
   await shop.locator('text=/Subtotal|Nothing in here yet/').first().waitFor({ timeout: 15000 })
   check('the cart survives a reload', /Ash Dining Table/.test(await visibleText(shop)))
 
-  // Two of them, so stepping down once is an ordinary decrement and the second empties it.
   const lastOne = shop.locator('button[aria-label="Remove Ash Dining Table from the cart"]')
   check('above one the minus is still a minus', (await lastOne.count()) === 0)
   await shop.locator('button[aria-label="Remove one Ash Dining Table"]').click()
@@ -88,7 +85,6 @@ test('The sheet does not reopen by itself', async ({ browser }) => {
   await shop.waitForTimeout(1500)
   await shop.locator('a[href="/products/oak-wall-shelf"]').first().click()
   await shop.waitForTimeout(2000)
-  // The action result rides in the client router cache, so coming back replays it.
   check('coming back to the product does not reopen it', !(await sheet()))
 
   await shop.getByRole('button', { name: 'Add to cart' }).click()
@@ -101,7 +97,6 @@ test('Carrying a guest cart into an account', async ({ browser }) => {
   const { context, page: guest } = await freshPage(browser)
   const cartText = async () => {
     await guest.goto(`${BASE}/cart`, { waitUntil: 'networkidle' })
-    // The cart streams behind Suspense, so wait for it rather than for the network.
     await guest.locator('text=/Subtotal|Nothing in here yet/').first().waitFor({ timeout: 15000 })
     return visibleText(guest)
   }
@@ -128,7 +123,6 @@ test('Carrying a guest cart into an account', async ({ browser }) => {
     await guest.waitForTimeout(2000)
   }
 
-  // The demo account persists between runs, so this starts from a known cart and empties it at the end.
   await signInAsDemo(guest, 'shopper')
   await emptyTheCart()
   await signOut()
@@ -143,7 +137,6 @@ test('Carrying a guest cart into an account', async ({ browser }) => {
   await add('ash-dining-table')
   await signInAsDemo(guest, 'shopper')
   const merged = await cartText()
-  // The account already held one, so the quantities are summed rather than replaced.
   check('the two carts are added together, not replaced', /2,560/.test(merged), merged.slice(0, 200))
 
   await emptyTheCart()
@@ -162,7 +155,6 @@ test('A claimed cart cannot be reached by its old cookie', async ({ browser }) =
 
   await signInAsDemo(victim, 'shopper')
 
-  // Whoever still holds that id must get nothing, because the cart now has an owner.
   const { context: holderContext, page: holder } = await freshPage(browser)
   await holderContext.addCookies([{ name: 'wicken_cart', value: cookie.value, url: BASE }])
   await holder.goto(`${BASE}/cart`, { waitUntil: 'networkidle' })
@@ -181,7 +173,6 @@ test('A claimed cart cannot be reached by its old cookie', async ({ browser }) =
   )
   await holderContext.close()
 
-  // Leave the demo account as it was found.
   for (let line = 0; line < 20; line++) {
     const remove = victim.getByRole('button', { name: 'Remove', exact: true }).first()
     if ((await remove.count()) === 0) break
@@ -199,7 +190,6 @@ test('Checkout', async ({ browser }) => {
 
   await signInAsDemo(buyer, 'shopper')
 
-  // A dining table and a mug in one order: the order ships together, so the table sets the date.
   for (const slug of ['ash-dining-table', 'ridge-breakfast-mug']) {
     await open(buyer, `/products/${slug}`)
     await buyer.getByRole('button', { name: 'Add to cart' }).click()
@@ -215,7 +205,6 @@ test('Checkout', async ({ browser }) => {
   )
   check('and the arrival window agrees', !/business days/.test(promised.match(/Arrives[^\n]*/)?.[0] ?? ''))
 
-  // The demo account persists between runs, so start from a known cart.
   const emptyTheCart = async () => {
     await buyer.goto(`${BASE}/cart`, { waitUntil: 'networkidle' })
     await buyer.locator('text=/Subtotal|Nothing in here yet/').first().waitFor({ timeout: 15000 })
@@ -239,11 +228,9 @@ test('Checkout', async ({ browser }) => {
   const summary = await visibleText(buyer)
   check('the cart is summarized before paying', /Ash Dining Table/.test(summary))
 
-  // CI has no Stripe key, so only the order creation is checked there; the handover needs a real key.
   const payable = !/not configured/.test(summary)
   if (payable) {
     check('the test card is offered, so nobody uses a real one', /4242 4242 4242 4242/.test(summary))
-    // Stripe's own page is somebody else's to break, so the suite stops at the handover.
     await buyer.getByRole('button', { name: /^Pay / }).click()
     await buyer.waitForURL(/checkout\.stripe\.com/, { timeout: 30000 }).catch(() => {})
     check('paying hands over to Stripe', buyer.url().includes('checkout.stripe.com'), buyer.url())
@@ -260,13 +247,11 @@ test('Checkout', async ({ browser }) => {
     await buyer.waitForTimeout(1500)
     orderUrl = buyer.url()
     check('and it opens', /Ash Dining Table/.test(await visibleText(buyer)))
-    // Nothing marked it paid, so the page must not pretend otherwise.
     check('an unpaid order is not called confirmed', !/confirmed/i.test(await visibleText(buyer)))
     check(
       'an unpaid order offers to finish paying',
       (await buyer.getByRole('button', { name: 'Complete payment' }).count()) === 1,
     )
-    // The order is the dead end this exists to fix, so press it rather than only find it.
     await buyer.getByRole('button', { name: 'Complete payment' }).click()
     await buyer.waitForURL(/checkout\.stripe\.com/, { timeout: 30000 }).catch(() => {})
     check('and pressing it reopens Stripe', buyer.url().includes('checkout.stripe.com'), buyer.url())
@@ -274,7 +259,6 @@ test('Checkout', async ({ browser }) => {
     await buyer.waitForTimeout(800)
     check('the order is still awaiting payment', /Awaiting payment/.test(await visibleText(buyer)))
 
-    // The detail page sits in the same column as the list, so their headings share an edge.
     const detailEdge = (await buyer.locator('h1').first().boundingBox()).x
     await open(buyer, `/account/orders`)
     const listEdge = (await buyer.locator('h1').first().boundingBox()).x

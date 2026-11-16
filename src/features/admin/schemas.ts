@@ -9,16 +9,13 @@ export const rangeLabels: Record<Range, string> = {
   '90': 'Last 90 days',
 }
 
-// Search params are user-controlled, so the page number falls back rather than throwing.
 export const pageNumber = z.coerce.number().int().min(1).max(10000).default(1).catch(1)
 
-/** What every admin list takes; the ones with their own filters extend it. */
 export const adminListSearch = z.object({
   q: z.string().trim().min(1).max(100).optional().catch(undefined),
   page: pageNumber,
 })
 
-/** Keeps the filters and moves the page, so paging never silently widens the list. */
 export function pageHref(path: string, filters: Record<string, string | undefined>, page: number): string {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(filters)) if (value) params.set(key, value)
@@ -27,12 +24,10 @@ export function pageHref(path: string, filters: Record<string, string | undefine
   return query ? `${path}?${query}` : path
 }
 
-/** Same as pageHref at page 1: filters only, nothing added for the default page. */
 export function adminHref(path: string, filters: Record<string, string | undefined>): string {
   return pageHref(path, filters, 1)
 }
 
-/** Clicking the active column flips it; any other column starts in its own natural direction. */
 export function sortHref<Key extends string>(
   path: string,
   filters: Record<string, string | undefined>,
@@ -48,7 +43,6 @@ export const adminSearchSchema = z.object({
   range: z.enum(ranges).default('30').catch('30'),
 })
 
-/** The window, and the one before it of the same length, so every figure can be compared. */
 export function windows(range: Range): { from: Date; to: Date; wasFrom: Date; wasTo: Date } {
   const days = Number(range)
   const to = new Date()

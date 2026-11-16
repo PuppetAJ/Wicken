@@ -8,7 +8,6 @@ const grid = 'grid grid-cols-1 gap-x-6 gap-y-10 min-[400px]:grid-cols-2 lg:grid-
 export function ProductGrid({
   products,
   from,
-  // A slot, so the grid never imports the cart or favorites across a feature boundary.
   actions,
   rating,
 }: {
@@ -18,7 +17,6 @@ export function ProductGrid({
   rating?: (product: Product) => ReactNode
 }) {
   return (
-    // Server-rendered tiles handed to a client wrapper, so only the wrapper ships.
     <Stagger className={grid}>
       {products.map((product, i) => (
         // Only the first row is preloaded; preloading eager tiles left the optimizer holding some responses open.

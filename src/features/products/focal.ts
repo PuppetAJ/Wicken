@@ -1,4 +1,3 @@
-// Hand-picked horizontal object-position values, as a percentage of the overflow.
 const focalX: Record<string, number> = {
   'ash-dining-table': 25,
   'ash-glaze-dinner-plate': 40,

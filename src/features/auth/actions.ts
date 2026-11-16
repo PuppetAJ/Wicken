@@ -11,7 +11,6 @@ import type { ActionState } from '@/lib/action-state'
 
 export type AuthState = ActionState
 
-// A wrong password and an unknown email both answer 401, so the form cannot enumerate accounts.
 function messageFor(error: unknown, fallback: string): string {
   if (error instanceof APIError) {
     if (error.status === 'TOO_MANY_REQUESTS') return throttled
@@ -69,7 +68,6 @@ export async function signInWithGoogle(_previous: AuthState, formData: FormData)
 }
 
 export async function signInAsDemo(_previous: AuthState, formData: FormData): Promise<AuthState> {
-  // Looser than sign-in: the demo password is printed on the page, so this is not a guessing target.
   if (!(await limitAttempts('demo', 15))) return { error: throttled }
 
   const account = formData.get('role') === 'admin' ? demoAccounts.admin : demoAccounts.customer
@@ -82,7 +80,6 @@ export async function signInAsDemo(_previous: AuthState, formData: FormData): Pr
   } catch (error) {
     return { error: messageFor(error, 'The demo accounts are missing. Run `pnpm db:seed`.') }
   }
-  // The admin button is a shortcut to the dashboard; the shopper goes back where they were.
   redirect(formData.get('role') === 'admin' ? '/admin' : safeNext(formData.get('next')))
 }
 

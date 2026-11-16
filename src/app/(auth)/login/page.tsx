@@ -11,7 +11,6 @@ import { LoginForm } from '@/features/auth/components/login-form'
 
 export const metadata = { title: 'Log in' }
 
-// The session and ?next= are request data, and a login form has nothing worth a skeleton.
 export const instant = false
 
 export default async function Page({ searchParams }: PageProps<'/login'>) {

@@ -5,7 +5,6 @@ import { Enter } from '@/components/motion'
 import { HeroTwoColumnWithPhoto } from '@/components/sections/hero-two-column-with-photo'
 import Image from 'next/image'
 
-// Arrives a piece at a time: the photograph leads by a beat and the words catch up.
 export function LandingHero() {
   return (
     <HeroTwoColumnWithPhoto
@@ -20,7 +19,6 @@ export function LandingHero() {
         </Enter>
       }
       headline={
-        // A span, because a heading holds phrasing content and a div is not that.
         <Enter as="span" className="block lg:text-5xl/12 xl:text-[3.5rem]/14" delay={0.12}>
           Made slowly, to be kept.
         </Enter>

@@ -2,7 +2,6 @@ import 'server-only'
 import { pool, transaction } from '../pool.ts'
 import type { Order } from '../types.ts'
 
-/** The aggregation both the account's orders and the admin's read through. */
 export const orderItemsJson = `COALESCE(
   json_agg(
     json_build_object(
@@ -18,7 +17,6 @@ const withItems = `
   LEFT JOIN order_items oi ON oi.order_id = o.id
 `
 
-/** One query, not one per order: this is the N+1 the old orders page had. */
 export async function listOrdersForUser(userId: string): Promise<Order[]> {
   const { rows } = await pool.query<Order>(
     `${withItems} WHERE o.user_id = $1 GROUP BY o.id ORDER BY o.created_at DESC`,
@@ -43,7 +41,6 @@ export async function getOrderByStripeSession(sessionId: string, userId: string)
   return rows[0] ?? null
 }
 
-/** Snapshots the cart into a pending order, pricing from the products table, never the caller. */
 export async function createPendingOrder(userId: string, cartId: string): Promise<Order> {
   return transaction(async (client) => {
     const { rows: items } = await client.query<{
@@ -94,7 +91,6 @@ export async function attachStripeSession(orderId: number, sessionId: string): P
   await pool.query('UPDATE orders SET stripe_session_id = $1 WHERE id = $2', [sessionId, orderId])
 }
 
-/** Pays, decrements stock and clears the cart in one transaction; false when already paid, so a replay is a no-op. */
 export async function markOrderPaid(sessionId: string): Promise<boolean> {
   return transaction(async (client) => {
     const { rows } = await client.query<{ id: number; user_id: string }>(

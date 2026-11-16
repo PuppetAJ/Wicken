@@ -18,7 +18,6 @@ export async function saveMessage(
   body: string,
   userId: string | null = null,
 ): Promise<void> {
-  // Postgres rejects a null byte outright, and one arriving here is somebody probing rather than asking.
   await pool.query('INSERT INTO messages (name, email, body, user_id) VALUES ($1, $2, $3, $4)', [
     withoutNulls(name),
     withoutNulls(email),

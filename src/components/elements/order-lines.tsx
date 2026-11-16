@@ -5,7 +5,6 @@ import { formatPrice } from '@/lib/format'
 
 export type Line = {
   name: string
-  /** Absent once the product behind the line is gone, which is why the name is a copy. */
   slug?: string | null
   image_url: string | null
   quantity: number
@@ -18,7 +17,6 @@ const thumbnails = {
   lg: { className: 'size-20', sizes: '80px' },
 }
 
-/** The same list of what was bought, whether it is a cart, a receipt or an order in the admin. */
 export function OrderLines({
   items,
   size = 'md',
@@ -69,7 +67,6 @@ export function OrderLines({
   )
 }
 
-/** An order stores copies of the name and slug, so a deleted product leaves a line with no link. */
 export function linesOf(items: OrderItem[]): Line[] {
   return items.map((item) => ({
     name: item.product_name,

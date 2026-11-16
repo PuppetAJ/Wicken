@@ -2,7 +2,6 @@
 
 import { useEffect, useRef, type ReactNode } from 'react'
 
-/** A scrollbar is hidden on a trackpad and absent on a phone, so this fades an edge with content past it. */
 export function Scroller({
   children,
   className = '',

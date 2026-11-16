@@ -37,7 +37,6 @@ export function ReviewVotes({
   const router = useRouter()
 
   function press(vote: boolean) {
-    // The same thumb again clears it, so a misclick is one press to undo.
     const next = tally.own === vote ? null : vote
     start(async () => {
       apply(next)

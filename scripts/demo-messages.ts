@@ -1,7 +1,6 @@
 import { pool } from '../src/lib/db/pool.ts'
 import { people } from './demo-people.ts'
 
-// Two are already dealt with, so the admin list has both states.
 const notes: [number, string, boolean][] = [
   [
     0,
@@ -26,7 +25,6 @@ const notes: [number, string, boolean][] = [
   ],
 ]
 
-/** Called by scripts/seed.ts, so one command produces the whole demo dataset. */
 export async function seedDemoMessages(): Promise<number> {
   const client = await pool.connect()
   try {

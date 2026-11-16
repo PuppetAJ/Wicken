@@ -27,7 +27,6 @@ export function NewsletterForm({ source, fineprint }: { source: 'footer' | 'land
       <input type="hidden" name="source" value={source} />
       <Honeypot />
       <div className="flex flex-col gap-2 sm:flex-row">
-        {/* The placeholder is the label, read out rather than drawn: this is a one field form. */}
         <div className="relative flex-1">
           <label htmlFor={id} className="sr-only">
             Email

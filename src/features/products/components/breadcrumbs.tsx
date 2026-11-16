@@ -4,7 +4,6 @@ import { categoryLabels, shopHref, type ShopSearch } from '../schemas'
 
 const link = 'text-olive-600 hover:text-olive-950 dark:text-olive-400 dark:hover:text-white'
 
-/** The shop's filters travel on the product link, so going back lands on the same results. */
 export function Breadcrumbs({ search, category, name }: { search: ShopSearch; category: Category; name: string }) {
   const filtered = Boolean(search.category || search.q || search.sort !== 'newest')
 

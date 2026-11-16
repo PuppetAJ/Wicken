@@ -42,7 +42,6 @@ export function AccountDropdown({ name, email, isAdmin }: { name: string; email:
           </DropdownMenuItem>
         ) : null}
         <DropdownMenuSeparator />
-        {/* Not a DropdownMenuItem: the menu closing on click would cancel the submit. */}
         <form action={signOut} className="px-1 pb-1">
           <button
             type="submit"

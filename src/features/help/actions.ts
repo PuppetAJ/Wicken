@@ -10,7 +10,6 @@ import { succeeded, type ActionState } from '@/lib/action-state'
 export type MessageState = ActionState
 
 export async function sendMessage(_previous: MessageState, formData: FormData): Promise<MessageState> {
-  // Answered as though it worked, because a bot told it failed simply tries again.
   if (isBot(formData)) return succeeded()
 
   const parsed = message.safeParse({

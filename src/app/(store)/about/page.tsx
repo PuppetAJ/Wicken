@@ -132,7 +132,6 @@ export default function AboutPage() {
   )
 }
 
-/** A photograph beside a couple of paragraphs, alternating sides down the page. */
 function Step({
   id,
   eyebrow,
@@ -186,7 +185,6 @@ const promises = [
   },
 ]
 
-/** Three things a buyer can hold us to, in place of numbers that only described the studio. */
 function Promises() {
   return (
     <section className="py-10 sm:py-14">

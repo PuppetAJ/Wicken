@@ -17,7 +17,6 @@ export function ProductForm({ product }: { product: Product }) {
     if (state?.error) toast.error(state.error)
   }, [state])
 
-  // Cents in the database, dollars in the form: nobody types 12800 for $128.
   const dollars = (cents: number | null) => (cents === null ? '' : (cents / 100).toFixed(2))
 
   return (
@@ -77,7 +76,6 @@ export function ProductForm({ product }: { product: Product }) {
         <Button type="submit" size="lg" disabled={pending}>
           {pending ? 'Saving…' : 'Save changes'}
         </Button>
-        {/* An order references its products, so a delete would break other people's history. */}
         <p className="text-xs text-olive-600 dark:text-olive-400">Deleting products is disabled on the demo.</p>
       </div>
     </form>

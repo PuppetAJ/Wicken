@@ -10,7 +10,6 @@ export default function HomePage() {
   return (
     <>
       <LandingHero />
-      {/* Each band reads the database, so the hero never waits on the catalog to be counted. */}
       <Suspense fallback={<CategoriesSkeleton />}>
         <Categories />
       </Suspense>

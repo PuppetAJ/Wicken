@@ -4,7 +4,6 @@ import { createContext, use, useState, type ReactNode } from 'react'
 
 const CartOpenContext = createContext<{ open: boolean; setOpen: (open: boolean) => void } | null>(null)
 
-// The sheet is in the header and its button is on the product page, so the state sits above both.
 export function CartOpenProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false)
   return <CartOpenContext value={{ open, setOpen }}>{children}</CartOpenContext>

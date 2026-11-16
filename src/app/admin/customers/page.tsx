@@ -25,7 +25,6 @@ export default async function Page({ searchParams }: PageProps<'/admin/customers
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1">
         <AdminHeading>Customers</AdminHeading>
-        {/* Read-only on purpose: an account is somebody's, and a demo should not delete one. */}
         <p className="text-sm text-olive-600 dark:text-olive-400">
           Read-only. Accounts cannot be edited or removed from here. {subscribers} on the newsletter list.
         </p>

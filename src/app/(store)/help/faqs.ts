@@ -1,4 +1,3 @@
-// The questions people actually send in, kept out of the page so it stays a layout.
 export const shipping = [
   {
     question: 'How long does delivery take?',

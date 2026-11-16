@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react'
 import { formatCount } from '@/lib/format'
 
-/** Page links rather than a button: a page of a list is a place, so it should be a URL. */
 export function Pagination({
   page,
   total,

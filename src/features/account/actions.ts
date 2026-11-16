@@ -14,7 +14,6 @@ export type AccountState = ActionState
 
 const displayName = z.object({ name: z.string().trim().min(1).max(80) })
 
-/** The demo accounts are shared, so one visitor cannot rename or delete them for everybody. */
 function isDemo(email: string) {
   return email === demoAccounts.customer.email || email === demoAccounts.admin.email
 }
@@ -37,7 +36,6 @@ export async function deleteAccount(_previous: AccountState, formData: FormData)
   if (!session) return { error: 'You are not signed in.' }
   if (isDemo(session.user.email)) return { error: 'The demo accounts are shared, so they cannot be deleted.' }
 
-  // Typing the address is the confirmation; a dialog alone is too easy to click through.
   if (formData.get('confirm') !== session.user.email) {
     return { error: 'Type your email address exactly to confirm.' }
   }

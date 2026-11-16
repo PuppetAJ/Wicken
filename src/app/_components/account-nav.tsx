@@ -15,7 +15,6 @@ export function AccountNav() {
 
   return (
     <nav aria-label="Account">
-      {/* Wraps rather than overflows: three links do not fit across a 320px phone. */}
       <ul className="flex flex-wrap gap-2 lg:flex-col lg:flex-nowrap lg:gap-1">
         {links.map(({ href, label, icon: Icon }) => {
           const current = pathname === href || pathname.startsWith(`${href}/`)

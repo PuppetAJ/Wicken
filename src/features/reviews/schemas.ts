@@ -21,10 +21,8 @@ export const reviewSortLabels: Record<ReviewSort, string> = {
   lowest: 'Lowest rated',
 }
 
-// Falls back rather than throwing, like every other user-controlled param.
 export const reviewSortSchema = z.enum(reviewSorts).default('helpful').catch('helpful')
 
-/** The reviews sort as a param on the product URL, keeping any shop params riding along. */
 export function reviewsHref(slug: string, from: string, sort: ReviewSort): string {
   const params = new URLSearchParams(from.replace(/^\?/, ''))
   if (sort === 'helpful') params.delete('reviews')
