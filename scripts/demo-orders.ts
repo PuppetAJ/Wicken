@@ -97,16 +97,11 @@ export async function seedDemoOrders(): Promise<number> {
         const fate = roll()
         const status = fate < 0.86 ? 'paid' : fate < 0.95 ? 'pending' : 'canceled'
 
+        const buyer = people[Math.floor(roll() * people.length)]
         const { rows } = await client.query<{ id: number }>(
           `INSERT INTO orders (user_id, status, total_cents, created_at, paid_at)
            VALUES ($1, $2, $3, $4, $5) RETURNING id`,
-          [
-            people[Math.floor(roll() * people.length)],
-            status,
-            total,
-            placed,
-            status === 'paid' ? new Date(placed.getTime() + 60_000) : null,
-          ],
+          [buyer, status, total, placed, status === 'paid' ? new Date(placed.getTime() + 60_000) : null],
         )
 
         for (const item of items) {
@@ -126,10 +121,6 @@ export async function seedDemoOrders(): Promise<number> {
         }
         if (status === 'paid') {
           const session = `seed-buy-${back}-${n}`
-          const buyer = rows[0]
-            ? await client.query<{ user_id: string }>('SELECT user_id FROM orders WHERE id = $1', [rows[0].id])
-            : null
-          const userId = buyer?.rows[0]?.user_id ?? null
           for (const [name, path] of [
             ['view', '/shop'],
             ['product_view', `/products/${items[0].product.slug}`],
@@ -144,7 +135,7 @@ export async function seedDemoOrders(): Promise<number> {
               productId:
                 name === 'view' || name === 'checkout_started' || name === 'purchase' ? null : items[0].product.id,
               at: placed,
-              userId,
+              userId: buyer,
             })
           }
         }
