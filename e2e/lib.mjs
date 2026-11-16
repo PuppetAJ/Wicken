@@ -1,11 +1,9 @@
 import { expect, test as base } from '@playwright/test'
+import { demoAccounts } from '../src/lib/auth/demo.ts'
 
 export const BASE = process.env.E2E_BASE_URL ?? 'http://localhost:3000'
 
-export const demo = {
-  shopper: { email: 'shopper@wicken.store', password: 'demo-password', name: 'Demo Shopper' },
-  admin: { email: 'admin@wicken.store', password: 'demo-password', name: 'Demo Admin' },
-}
+export const demo = { shopper: demoAccounts.customer, admin: demoAccounts.admin }
 
 export const test = base.extend({
   page: async ({ page }, use) => {
