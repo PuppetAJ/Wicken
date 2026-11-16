@@ -5,16 +5,14 @@ export function MetricCard({
   value,
   was,
   now,
-  invert = false,
 }: {
   label: string
   value: string
   was: number
   now: number
-  invert?: boolean
 }) {
   const change = was === 0 ? (now === 0 ? 0 : null) : ((now - was) / was) * 100
-  const better = change === null ? true : invert ? change < 0 : change > 0
+  const better = change === null || change > 0
   const flat = change === 0
 
   const Icon = flat ? ArrowRightIcon : (change ?? 1) > 0 ? ArrowUpRightIcon : ArrowDownRightIcon
