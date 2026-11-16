@@ -61,3 +61,5 @@ export type Order = {
   paid_at: Date | null
   items: OrderItem[]
 }
+
+export type PriceRange = { fromCents: number; belowCents: number | null }

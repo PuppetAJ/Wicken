@@ -1,4 +1,4 @@
-import { categories } from '@/lib/db/types'
+import { categories, type PriceRange } from '@/lib/db/types'
 import { z } from 'zod'
 
 export const categoryLabels: Record<(typeof categories)[number], string> = {
@@ -97,11 +97,11 @@ export const priceBandLabels: Record<(typeof priceBands)[number], string> = {
   'over-200': 'Over $200',
 }
 
-export const priceBandRanges: Record<(typeof priceBands)[number], [number, number | null]> = {
-  'under-50': [0, 5000],
-  '50-100': [5000, 10000],
-  '100-200': [10000, 20000],
-  'over-200': [20000, null],
+export const priceBandRanges: Record<(typeof priceBands)[number], PriceRange> = {
+  'under-50': { fromCents: 0, belowCents: 5000 },
+  '50-100': { fromCents: 5000, belowCents: 10000 },
+  '100-200': { fromCents: 10000, belowCents: 20000 },
+  'over-200': { fromCents: 20000, belowCents: null },
 }
 
 export const sorts = ['newest', 'price-asc', 'price-desc', 'name'] as const

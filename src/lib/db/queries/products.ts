@@ -1,6 +1,6 @@
 import 'server-only'
 import { pool } from '../pool.ts'
-import type { Category, Product } from '../types.ts'
+import type { Category, PriceRange, Product } from '../types.ts'
 import { searchTerm } from '../text.ts'
 
 export type ProductSort = 'newest' | 'price-asc' | 'price-desc' | 'name'
@@ -24,7 +24,7 @@ export async function listProducts({
   search?: string
   materials?: string[]
   colors?: string[]
-  priceRanges?: [number, number | null][]
+  priceRanges?: PriceRange[]
   sort?: ProductSort
 } = {}): Promise<Product[]> {
   const { rows } = await pool.query<Product>(
@@ -44,8 +44,8 @@ export async function listProducts({
       search ? searchTerm(search) : null,
       materials?.length ? materials : null,
       colors?.length ? colors : null,
-      priceRanges?.length ? priceRanges.map(([lo]) => lo) : null,
-      priceRanges?.length ? priceRanges.map(([, hi]) => hi) : null,
+      priceRanges?.length ? priceRanges.map((range) => range.fromCents) : null,
+      priceRanges?.length ? priceRanges.map((range) => range.belowCents) : null,
     ],
   )
   return rows
