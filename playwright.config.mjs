@@ -1,9 +1,8 @@
+import { existsSync } from 'node:fs'
 import { loadEnvFile } from 'node:process'
 import { defineConfig, devices } from '@playwright/test'
 
-try {
-  loadEnvFile('.env')
-} catch {}
+if (existsSync('.env')) loadEnvFile('.env')
 
 const CI = Boolean(process.env.CI)
 

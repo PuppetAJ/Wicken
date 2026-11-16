@@ -51,9 +51,9 @@ export async function laidOut(page) {
 }
 
 export async function open(page, path) {
-  const admin = path.startsWith('/admin')
-  await page.goto(`${BASE}${path}`, { waitUntil: admin ? 'domcontentloaded' : 'networkidle' })
-  if (admin) await page.locator('h1').first().waitFor()
+  const neverIdles = path.startsWith('/admin')
+  await page.goto(`${BASE}${path}`, { waitUntil: neverIdles ? 'domcontentloaded' : 'networkidle' })
+  if (neverIdles) await page.locator('h1').first().waitFor()
   await laidOut(page)
 }
 
@@ -87,14 +87,14 @@ export async function signInAsDemo(page, role = 'shopper') {
 
 export async function openAccountMenu(page) {
   const menu = page.locator('[role="menu"]')
-  await retry(async () => {
+  await retryUntilHydrated(async () => {
     await page.locator('button[aria-label="Account menu"]').click()
     await menu.waitFor({ timeout: 2_000 })
   })
   return menu.innerText()
 }
 
-async function retry(run, attempts = 10) {
+async function retryUntilHydrated(run, attempts = 10) {
   for (let attempt = 1; ; attempt++) {
     try {
       return await run()
