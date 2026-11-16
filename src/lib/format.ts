@@ -26,10 +26,10 @@ export function formatMonthAndDay(date: Date): string {
   return monthAndDay.format(date)
 }
 
-export function formatDay(date: Date): string {
+export function formatUtcDay(date: Date): string {
   return utcDay.format(date)
 }
 
-export function formatDayShort(date: Date): string {
+export function formatUtcDayShort(date: Date): string {
   return utcDayShort.format(date)
 }

@@ -11,7 +11,7 @@ import type { Order } from '@/lib/db/types'
 import type Stripe from 'stripe'
 import { succeeded, type ActionState } from '@/lib/action-state'
 
-export type CheckoutState = ActionState<{ settled?: boolean }>
+export type CheckoutState = ActionState<{ markedPaid?: boolean }>
 
 export async function startCheckout(): Promise<CheckoutState> {
   const user = await requireUser()
@@ -78,9 +78,9 @@ export async function resumePayment(orderId: number): Promise<CheckoutState> {
     if (order.stripe_session_id) {
       const old = await stripe.checkout.sessions.retrieve(order.stripe_session_id)
       if (old.payment_status === 'paid') {
-        const settled = await markOrderPaid(order.stripe_session_id)
+        const markedPaid = await markOrderPaid(order.stripe_session_id)
         revalidatePath('/', 'layout')
-        return { ...succeeded(), settled }
+        return { ...succeeded(), markedPaid }
       }
       if (old.status === 'open') await stripe.checkout.sessions.expire(order.stripe_session_id)
     }

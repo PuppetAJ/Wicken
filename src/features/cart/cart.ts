@@ -29,7 +29,7 @@ export async function getCartCount(): Promise<number> {
   return cartId ? countCartItems(cartId) : 0
 }
 
-export async function resolveCartId(): Promise<string> {
+export async function getOrCreateCartId(): Promise<string> {
   const session = await getSession()
   if (session) {
     return (await getCartIdForUser(session.user.id)) ?? (await createCartForUser(session.user.id))

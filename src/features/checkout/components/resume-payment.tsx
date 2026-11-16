@@ -13,7 +13,7 @@ export function ResumePayment({ orderId, size = 'md' }: { orderId: number; size?
   useEffect(() => {
     if (state?.error) toast.error(state.error)
     if (!state?.ok) return
-    if (state.settled) toast.success('Payment confirmed', { description: 'This order is now marked as paid.' })
+    if (state.markedPaid) toast.success('Payment confirmed', { description: 'This order is now marked as paid.' })
     else toast('Payment received', { description: 'Please allow a moment for it to show on this order.' })
     router.refresh()
   }, [state, router])

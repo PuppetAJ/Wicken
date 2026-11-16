@@ -12,7 +12,7 @@ import { categoryLabels } from '@/features/products/schemas'
 import { requireAdmin } from '@/lib/auth/session'
 import { lowStock, revenueByDay, salesByCategory, topSellers, totalsBetween } from '@/lib/db/queries/dashboard'
 import { funnelBetween, sessionsByDay, visitorsBetween } from '@/lib/db/queries/events'
-import { formatCount, formatDay, formatPrice } from '@/lib/format'
+import { formatCount, formatUtcDay, formatPrice } from '@/lib/format'
 import { AdminHeading } from '@/features/admin/components/admin-heading'
 
 export const metadata = { title: 'Admin' }
@@ -60,7 +60,7 @@ async function Figures({ range }: { range: '7' | '30' | '90' }) {
     visitorsBetween(from, to),
   ])
 
-  const since = formatDay(from)
+  const since = formatUtcDay(from)
   const conversion = funnel.sessions > 0 ? (funnel.purchases / funnel.sessions) * 100 : 0
   const wasConversion = wasFunnel.sessions > 0 ? (wasFunnel.purchases / wasFunnel.sessions) * 100 : 0
 
@@ -108,24 +108,24 @@ async function Figures({ range }: { range: '7' | '30' | '90' }) {
         title="Signed-in shoppers"
         note="People with an account. Anonymous visits are counted under Sessions and cannot appear here."
       >
-        {visitors.known === 0 ? (
+        {visitors.signedIn === 0 ? (
           <Empty>No signed-in shopper looked at anything in this period.</Empty>
         ) : (
           <ul className="flex flex-col gap-4">
             {[
               {
-                count: visitors.known,
+                count: visitors.signedIn,
                 of: null,
                 says: `accounts signed in and looked at something since ${since}`,
               },
               {
                 count: visitors.returning,
-                of: visitors.known,
+                of: visitors.signedIn,
                 says: `had also visited before ${since}`,
               },
               {
                 count: visitors.bought,
-                of: visitors.known,
+                of: visitors.signedIn,
                 says: `bought something since ${since}`,
               },
             ].map(({ count, of, says }) => (
